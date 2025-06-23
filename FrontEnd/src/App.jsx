@@ -1,8 +1,7 @@
-
 function App() {
   return(
     <div>
-      <h1>My first mern project</h1>
+      <h1>Complaint Management System</h1>
     </div>
   )
 }
