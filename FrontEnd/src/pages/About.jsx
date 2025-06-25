@@ -1,7 +1,7 @@
 import React from "react";
 export default function About() {
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto mt-15">
       <h2 className="text-3xl font-bold text-white mb-8">About ResolveNow</h2>
       <div className="bg-[#1F2937] rounded-xl shadow-md p-8 border-t-4 border-[#06B6D4]">
         <div className="prose prose-lg max-w-none prose-invert">

@@ -1,10 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Footer from "../components/Footer";
+import Footer from "./Footer";
+import ResolveNow from "./ResolveNow";
 
 export default function Home() {
   return (
     <>
+    <ResolveNow/>
       <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 md:px-12">
         <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-6xl">
           {/* Text Section */}
@@ -14,15 +16,10 @@ export default function Home() {
               ResolveNow provides a seamless platform to register and track your complaints.
               Our system ensures your concerns are heard and addressed promptly by the right people.
             </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center md:justify-start">
-              <Link to="/login">
-                <button className="bg-[#06B6D4] text-[#1F2937] px-8 py-3 rounded-full font-bold hover:bg-[#0891B2] transition shadow-lg">
-                  Login
-                </button>
-              </Link>
+            <div className="flex flex-col gap-6 justify-center md:justify-start">
               <Link to="/signup">
-                <button className="border-2 border-[#06B6D4] text-[#06B6D4] px-8 py-3 rounded-full font-bold hover:bg-[#06B6D4] hover:text-[#1F2937] transition shadow-lg">
-                  Register
+                <button className="bg-[#06B6D4] text-[#1F2937] px-8 py-3 rounded-full font-bold hover:bg-[#0891B2] transition shadow-lg">
+                  Register a complaint
                 </button>
               </Link>
             </div>

@@ -1,26 +1,88 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import ResolveNow from "./components/ResolveNow";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import Complaints from "./pages/Complaints";
-import SubmitComplaint from "./pages/SubmitComplaint";
+import { BrowserRouter as Router, Routes, Route, Outlet } from "react-router-dom";
+
+// Import Navbars
+import Navbar from "./components/user/Navbar";
+
+import UserComplaints from "./components/user/Complaints";
+import SubmitComplaint from "./components/user/SubmitComplaint";
+import Status from "./components/user/Status";
+import UserHome from "./components/user/UserHome";
 import About from "./pages/About";
+
+import AdminHome from "./components/admin/AdminHome";
+import Agents from "./components/admin/Agents";
+import UserComplaintsAdmin from "./components/admin/UserComplaints";
+
+import AgentHome from "./components/Agent/AgentHome";
+
+import Home from "./components/common/Home";
+import Login from "./components/common/Login";
+import Signup from "./components/common/Signup";
+
+// Layout wrappers for navbars
+function UserLayout() {
+  return (
+    <>
+      <Navbar />
+      <Outlet />
+    </>
+  );
+}
+
+function AdminLayout() {
+  // If you have an AdminNavbar, add it here
+  return (
+    <>
+      {/* <AdminNavbar /> */}
+      <Outlet />
+    </>
+  );
+}
+
+function AgentLayout() {
+  // If you have an AgentNavbar, add it here
+  return (
+    <>
+      {/* <AgentNavbar /> */}
+      <Outlet />
+    </>
+  );
+}
 
 export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<ResolveNow />}>
-          <Route index element={<Home />} />
-          <Route path="login" element={<Login />} />
-          <Route path="signup" element={<Signup />} />
-          <Route path="complaints" element={<Complaints />} />
-          <Route path="submit" element={<SubmitComplaint />} />
-          <Route path="about" element={<About />} />
-        </Route>
-      </Routes>
-    </Router>
+    <div className="bg-gray-900 min-h-screen">
+      <Router>
+        <Routes>
+          {/* User Routes */}
+          <Route path="/user" element={<UserLayout />}>
+            <Route index element={<UserHome />} />
+            <Route path="complaints" element={<UserComplaints />} />
+            <Route path="status" element={<Status />} />
+            <Route path="submit" element={<SubmitComplaint />} />
+            <Route path="about" element={<About />} />
+          </Route>
+
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminHome />} />
+            <Route path="agents" element={<Agents />} />
+            <Route path="complaints" element={<UserComplaintsAdmin />} />
+          </Route>
+
+          {/* Agent Routes */}
+          <Route path="/agent" element={<AgentLayout />}>
+            <Route index element={<AgentHome />} />
+            {/* Add other agent-specific routes here if needed */}
+          </Route>
+
+          {/* Public/Common Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+        </Routes>
+      </Router>
+    </div>
   );
 }

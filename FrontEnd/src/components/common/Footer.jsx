@@ -13,12 +13,7 @@ export default function Footer() {
           </span>
         </div>
         {/* Middle: Links */}
-       <div className="flex flex-col items-center gap-3 text-center">
-  <a href="/" className="text-[#06B6D4] hover:underline transition">Home</a>
-  <a href="/about" className="text-[#06B6D4] hover:underline transition">About</a>
-  <a href="/complaints" className="text-[#06B6D4] hover:underline transition">My Complaints</a>
-  <a href="/submit" className="text-[#06B6D4] hover:underline transition">Submit Complaint</a>
-</div>
+    
         {/* Right: Contact & Social */}
         <div className="flex flex-col items-center md:items-end space-y-2">
           <div className="flex items-center space-x-2">
