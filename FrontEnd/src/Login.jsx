@@ -1,14 +1,33 @@
 import React, { useState } from 'react'
 
 const Login = () => {
+  const [formData,setFormData] = useState({
+    email:"",password:"",
+  })
+
+  const handleChange = (e)=>{
+    setFormData({...formData,[e.target.name]:e.target.value});
+  }
+
+  const handleSubmit = async (e)=>{
+    e.preventDefault();
+
+    const response = await fetch("http://localhost:5000/api/user/login",{
+      method:"post",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    })
+
+    const data = await response.json();
+    alert(data.message);
+  }
+
+
   return (
     <div>
-        <h1>Login</h1>
-        <label htmlFor="email">Email</label>
-        <input type="text" name="email" id="email" /><br></br>
-        <label htmlFor="password">Password</label>
-        <input type="password" name="password" id="password" /><br></br>
-        <button>Sign Up</button>
+       <input name="email" onChange={handleChange} placeholder="Email" />
+      <input name="password" onChange={handleChange} type="password" placeholder="Password" />
+      <button onSubmit={handleSubmit}>Login</button>
     </div>
   )
 }
