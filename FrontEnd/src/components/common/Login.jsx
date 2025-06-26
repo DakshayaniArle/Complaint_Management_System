@@ -1,5 +1,7 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "", usertype: "user" });
@@ -18,22 +20,38 @@ export default function Login() {
     }
     setError("");
     try {
-      // Send login request to backend
-     // const res = await fetch("http://localhost:5000/api/login", {
-     //   method: "POST",
-     //   headers: { "Content-Type": "application/json" },
-       // body: JSON.stringify(form),
-      //});
-      //const data = await res.json();
-      //if (!res.ok) {
-       // setError(data.error || "Login failed");
-       // return;
-      //}
-      alert(`Logged in as ${data.email || form.email} as ${form.usertype}`);
-      navigate("/complaints");
+      await axios.post("http://localhost:5000/login",form)
+      .then((res)=>{
+        alert("successfully loin")
+        localStorage.setItem("form",JSON.stringify(res.data));
+        console.log(res.data);
+        const isLoggedIn =JSON.parse(localStorage.getItem("form"));
+        const {usertype} = isLoggedIn;
+        switch(usertype){
+          case "admin":
+            navigate("/admin");
+            break;
+          case "agent":
+            navigate("/agent");
+            break;
+          case "user":
+            navigate("/user");
+            break;
+          default:
+            navigate("/login");
+            break;
+        }
+      })
     } catch (err) {
-      setError("Server error. Please try again.");
+      if(err.response && err.response.status === 401){
+        setError("Invalid Credentials");
+      }else if (err.response && err.response.status === 404) {
+      setError("User doesn't exist");
+     }else{
+         setError("Server error. Please try again.");
+      }
     }
+
   };
 
   return (

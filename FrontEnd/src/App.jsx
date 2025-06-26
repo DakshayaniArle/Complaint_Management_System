@@ -1,14 +1,3 @@
-
-import SignUp from "./SignUp"
-
-function App() {
-  return(
-    <div>
-      <h1>Complaint Management System</h1>
-      <SignUp />
-    </div>
-  )
-}
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Outlet } from "react-router-dom";
 
@@ -24,6 +13,7 @@ import About from "./pages/About";
 import AdminHome from "./components/admin/AdminHome";
 import Agents from "./components/admin/Agents";
 import UserComplaintsAdmin from "./components/admin/UserComplaints";
+import { ComplaintProvider } from "./components/user/ComplaintContext";
 
 import AgentHome from "./components/Agent/AgentHome";
 
@@ -64,6 +54,7 @@ function AgentLayout() {
 
 export default function App() {
   return (
+    <ComplaintProvider>
     <div className="bg-gray-900 min-h-screen">
       <Router>
         <Routes>
@@ -96,5 +87,6 @@ export default function App() {
         </Routes>
       </Router>
     </div>
+    </ComplaintProvider>
   );
 }

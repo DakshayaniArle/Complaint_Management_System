@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 export default function Signup() {
+  const [title,setTitle] = useState("user");
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -11,8 +13,16 @@ export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
+
+
+  const handleTitle = (select)=>{
+    setTitle(select);
+    setForm({...form, usertype:select});
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,8 +30,7 @@ export default function Signup() {
       !form.name ||
       !form.email ||
       !form.password ||
-      !form.confirm ||
-      !form.usertype
+      !form.confirm 
     ) {
       setError("All fields are required.");
       return;
@@ -31,31 +40,32 @@ export default function Signup() {
       return;
     }
     setError("");
-    // try {
-    //   const res = await fetch('http://localhost:5000/api/signup', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({
-    //       name: form.name,
-    //       email: form.email,
-    //       password: form.password,
-    //       usertype: form.usertype,
-    //     }),
-    //   });
-    //   const data = await res.json();
-    //   if (!res.ok) {
-    //     setError(data.error || "Registration failed");
-    //     return;
-    //   }
-    //   alert("Registered successfully!");
-    //   navigate("/login");
-    // } catch (err) {
-    //   setError("Server error. Please try again.");
-    // }
-    alert(
-      `Registered as ${form.email} with usertype: ${form.usertype}`
+    const updatedUser = {...form, usertype:title};
+    axios.post("http://localhost:5000/SignUp",updatedUser)
+    .then((res)=>{
+      alert("recorded submitted");
+      console.log(res.data);
+       alert(
+      `Registered as ${form.usertype} with : ${form.email}`
     );
+    setForm({
+         name: "",
+         email: "",
+         password: "",
+         phone: "",
+         usertype: "user"
+      })
     navigate("/login");
+    })
+    .catch((err)=>{
+      console.log(err);
+      if (err.response && err.response.data && err.response.data.error) {
+      setError(err.response.data.error);
+    } else {
+      setError("Something went wrong. Please try again.");
+    }
+    })
+   
   };
 
   return (
@@ -117,9 +127,9 @@ export default function Signup() {
               className="w-full px-4 py-2 rounded-lg bg-[#1F2937] border border-gray-700 text-[#06B6D4] focus:outline-none focus:ring-2 focus:ring-[#06B6D4]"
               required
             >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-              <option value="agent">Agent</option>
+              <option value="user" onClick={() => handleTitle("User")}>User</option>
+              <option value="admin" onClick={() => handleTitle("Admin")}>Admin</option>
+              <option value="agent" onClick={() => handleTitle("Agent")}>Agent</option>
             </select>
           </div>
           <div>

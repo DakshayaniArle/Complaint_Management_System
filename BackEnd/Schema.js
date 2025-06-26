@@ -5,16 +5,15 @@ const mongoose = require("mongoose");
 const userSchema = mongoose.Schema({
     name:{type:String , required:"Name is required"},
     email:{type:String , required:"email is required"},
-    userType:{type:String,required:"userType is required"},
+    usertype:{type:String,required:"userType is required"},
     password:{type:String,required:"password is required"},
-    phone:{type:String,required:"Phone number is required"},
 },
 {
     timestamps:true
 });
 
 // User Model
- const userModel = mongoose.model("usersData",userSchema);
+ const userModel = mongoose.model("usersData",userSchema,"usersData");
 
  ////////////// Complaint Schema ///////////////////////////////
  const complaintSchema = mongoose.Schema({
@@ -22,4 +21,4 @@ const userSchema = mongoose.Schema({
  })
 
 
-
+module.exports = {userModel}

@@ -22,7 +22,7 @@ export default function UserHome() {
                 <p className="text-gray-300 mb-4">
                   Facing an issue? Click below to register a new complaint and get it resolved swiftly by our support team.
                 </p>
-                <Link to="/submit">
+                <Link to="/user/submit">
                   <button className="bg-[#06B6D4] text-[#1F2937] px-6 py-2 rounded-full font-bold hover:bg-[#0891B2] transition shadow-lg">
                     Register a Complaint
                   </button>
@@ -34,7 +34,7 @@ export default function UserHome() {
                 <p className="text-gray-300 mb-4">
                   Stay up-to-date with your complaint's progress. View live status, updates, and resolution timelines.
                 </p>
-                <Link to="/status">
+                <Link to="/user/status">
                   <button className="border-2 border-[#06B6D4] text-[#06B6D4] px-6 py-2 rounded-full font-bold hover:bg-[#06B6D4] hover:text-[#1F2937] transition shadow-lg">
                     View Status
                   </button>
@@ -46,7 +46,7 @@ export default function UserHome() {
                 <p className="text-gray-300 mb-4">
                   Access a complete log of your submitted complaints, status changes, and resolutions at any time.
                 </p>
-                <Link to="/complaints">
+                <Link to="/user/complaints">
                   <button className="border-2 border-[#06B6D4] text-[#06B6D4] px-6 py-2 rounded-full font-bold hover:bg-[#06B6D4] hover:text-[#1F2937] transition shadow-lg">
                     My Complaints
                   </button>
