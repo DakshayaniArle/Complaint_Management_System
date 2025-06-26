@@ -22,7 +22,7 @@ export default function SubmitComplaint() {
     };
     addComplaint(data);
     alert("Complaint submitted successfully!");
-    navigate("/complaints");
+    navigate("/user/complaints");
   };
 
   return (
