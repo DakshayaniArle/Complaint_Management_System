@@ -30,7 +30,7 @@ export default function UserHome() {
                   get it resolved swiftly by our support team.
                 </p>
                 <Link to="/user/submit">
-                  <button className="bg-[#06B6D4] text-[#1F2937] px-6 py-2 rounded-full font-bold hover:bg-[#0891B2] transition shadow-lg w-full">
+                  <button className="bg-[#06B6D4] text-[#1F2937] px-6 py-2 rounded-full font-bold hover:bg-[#0891B2] transition shadow-lg">
                     Register a Complaint
                   </button>
                 </Link>

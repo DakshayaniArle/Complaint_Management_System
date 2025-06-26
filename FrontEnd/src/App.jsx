@@ -52,7 +52,7 @@ function AgentLayout() {
 export default function App() {
   return (
     <div className="bg-gray-900 min-h-screen">
-      <ComplaintProvider> {/* 👈 Wrap with your context provider */}
+      <ComplaintProvider> 
         <Router>
           <Routes>
             {/* User Routes */}

@@ -47,7 +47,7 @@ export default function AdminHome() {
             <Link to="/admin/complaints" className="hover:text-[#06B6D4] font-medium transition">User Complaints</Link>
           </div>
           <button className="bg-white text-[#06B6D4] px-4 py-2 rounded-full font-medium hover:bg-[#06B6D4] hover:text-white border border-[#06B6D4] shadow transition"
-          onClick={() => { navigate("/login"); }}>
+          onClick={()=>{ window.location.href='/login' }}>
             Logout
           </button>
         </div>

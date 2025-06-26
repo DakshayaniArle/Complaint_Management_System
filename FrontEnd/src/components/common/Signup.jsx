@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import ResolveNow from "./ResolveNow";
 
 export default function Signup() {
+  const [title, setTitle] = useState("user");
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -17,37 +19,61 @@ export default function Signup() {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
+  const handleTitle = (select) => {
+    setTitle(select);
+    setForm({ ...form, usertype: select });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.password || !form.confirm || !form.usertype) {
+
+    if (!form.name || !form.email || !form.password || !form.confirm) {
       setError("All fields are required.");
       return;
     }
+
     if (form.password !== form.confirm) {
       setError("Passwords do not match.");
       return;
     }
-    setError("");
 
-    // Fake success
-    alert(`Registered as ${form.email} with usertype: ${form.usertype}`);
-    navigate("/login");
+    setError("");
+    const updatedUser = { ...form, usertype: title };
+
+    try {
+      const res = await axios.post("http://localhost:5000/SignUp", updatedUser);
+      alert(`Registered as ${updatedUser.usertype} with email: ${updatedUser.email}`);
+      setForm({
+        name: "",
+        email: "",
+        password: "",
+        confirm: "",
+        usertype: "user",
+      });
+      navigate("/login");
+    } catch (err) {
+      console.error(err);
+      if (err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
+    }
   };
 
   return (
     <>
       <ResolveNow />
-
       <div className="flex items-center justify-center min-h-[80vh] bg-[#111827] px-4 py-12 sm:px-6 lg:px-8">
         <div className="w-full max-w-md bg-[#1F2937] rounded-xl shadow-xl p-6 sm:p-8 border-t-4 border-[#06B6D4]">
           <h2 className="text-3xl font-bold text-center text-[#06B6D4] mb-6">Register</h2>
-          
+
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && <div className="bg-red-500 text-white p-2 rounded">{error}</div>}
-            
+
             <InputField id="name" label="Name" value={form.name} onChange={handleChange} />
             <InputField id="email" label="Email" type="email" value={form.email} onChange={handleChange} />
-            
+
             <div>
               <label htmlFor="usertype" className="block text-[#06B6D4] mb-1">User Type</label>
               <select
@@ -57,9 +83,9 @@ export default function Signup() {
                 onChange={handleChange}
                 className="w-full px-4 py-2 rounded-lg bg-[#1F2937] border border-gray-700 text-[#06B6D4] focus:outline-none focus:ring-2 focus:ring-[#06B6D4]"
               >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-                <option value="agent">Agent</option>
+                <option value="user" onClick={() => handleTitle("user")}>User</option>
+                <option value="admin" onClick={() => handleTitle("admin")}>Admin</option>
+                <option value="agent" onClick={() => handleTitle("agent")}>Agent</option>
               </select>
             </div>
 
@@ -98,6 +124,7 @@ export default function Signup() {
   );
 }
 
+// Reusable input field
 function InputField({ id, label, value, onChange, type = "text" }) {
   return (
     <div>
@@ -115,6 +142,7 @@ function InputField({ id, label, value, onChange, type = "text" }) {
   );
 }
 
+// Reusable password field with toggle
 function PasswordField({ id, label, value, onChange, show, toggleShow }) {
   return (
     <div>

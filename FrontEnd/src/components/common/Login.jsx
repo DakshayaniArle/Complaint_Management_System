@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ResolveNow from "./ResolveNow";
@@ -17,14 +18,38 @@ export default function Login() {
       setError("Please fill in all fields.");
       return;
     }
+
     setError("");
 
     try {
-      // Simulated successful login
-      alert(`Logged in as ${form.email} as ${form.usertype}`);
-      navigate("/complaints");
+      const res = await axios.post("http://localhost:5000/login", form);
+
+      // Store in localStorage
+      localStorage.setItem("userData", JSON.stringify(res.data));
+
+      // Redirect based on usertype
+      const { usertype } = res.data;
+      switch (usertype) {
+        case "admin":
+          navigate("/admin");
+          break;
+        case "agent":
+          navigate("/agent");
+          break;
+        case "user":
+          navigate("/user");
+          break;
+        default:
+          navigate("/login");
+      }
     } catch (err) {
-      setError("Server error. Please try again.");
+      if (err.response?.status === 401) {
+        setError("Invalid credentials.");
+      } else if (err.response?.status === 404) {
+        setError("User does not exist.");
+      } else {
+        setError("Server error. Please try again.");
+      }
     }
   };
 
