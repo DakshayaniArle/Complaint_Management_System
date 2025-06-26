@@ -1,9 +1,7 @@
 import React, { useRef } from "react";
-import { useComplaints } from "./ComplaintContext";
 import { useNavigate } from "react-router-dom";
 
 export default function SubmitComplaint() {
-  const { addComplaint } = useComplaints();
   const navigate = useNavigate();
   const formRef = useRef();
 
@@ -18,11 +16,13 @@ export default function SubmitComplaint() {
       title: form.title.value,
       description: form.description.value,
       fullDescription: form.description.value,
-      attachments: [], // You can handle file uploads if needed
+      attachments: [], 
     };
-    addComplaint(data);
+
+    
+    console.log("Complaint Data:", data);
     alert("Complaint submitted successfully!");
-    navigate("/complaints");
+    navigate("/user/complaints");
   };
 
   return (
@@ -107,26 +107,6 @@ export default function SubmitComplaint() {
               required
             ></textarea>
           </div>
-          {/* Attachments */}
-          <div>
-            <label className="block text-[#06B6D4] font-medium mb-2">
-              Attachments (optional)
-            </label>
-            <div className="flex flex-col items-start space-y-2">
-              <label className="w-full flex flex-col items-center px-4 py-6 bg-[#06B6D4]/10 text-[#06B6D4] rounded-lg shadow-md tracking-wide uppercase border border-[#06B6D4]/50 cursor-pointer hover:bg-[#06B6D4]/20 transition">
-                <span className="mt-2 text-base leading-normal">
-                  Drag and drop files here or click to browse
-                </span>
-                <input type="file" multiple className="hidden" />
-              </label>
-              <button
-                type="button"
-                className="bg-[#06B6D4]/10 text-[#06B6D4] px-4 py-2 rounded-lg hover:bg-[#06B6D4]/20 transition"
-              >
-                Choose Files
-              </button>
-            </div>
-          </div>
           {/* Terms and conditions */}
           <div className="flex items-center">
             <input type="checkbox" id="terms" className="mr-2 accent-[#06B6D4]" required />
@@ -136,12 +116,6 @@ export default function SubmitComplaint() {
           </div>
           {/* Action Buttons */}
           <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              className="px-6 py-3 border border-gray-500 text-gray-300 rounded-lg hover:bg-gray-700 transition"
-            >
-              Save as Draft
-            </button>
             <button
               type="submit"
               className="bg-[#06B6D4] text-[#1F2937] px-6 py-3 rounded-lg font-medium hover:bg-[#0891B2] transition"

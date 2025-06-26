@@ -9,7 +9,7 @@ export default function ResolveNow() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   return (
-    <div className={`${BG_DARK} min-h-screen`}>
+    <div className={`${BG_DARK}`}>
       <nav className="bg-gradient-to-r from-[#1F2937] to-[#06B6D4] text-white shadow-lg sticky top-0 z-40">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center space-x-2">
@@ -59,9 +59,7 @@ export default function ResolveNow() {
           </div>
         )}
       </nav>
-      <main className="container mx-auto px-4 py-8">
-        <Outlet />
-      </main>
+      
     </div>
   );
 }

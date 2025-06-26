@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import ResolveNow from "./ResolveNow";
 export default function Signup() {
   const [form, setForm] = useState({
     name: "",
@@ -59,7 +60,12 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[70vh]">
+    <>
+    <ResolveNow/>
+    
+    
+    <div className="flex items-center justify-center min-h-[70vh] mt-15">
+      
       <div className="w-full max-w-md bg-[#1F2937] rounded-lg shadow-lg p-8 border-t-4 border-[#06B6D4]">
         <h2 className="text-3xl font-bold mb-6 text-center text-[#06B6D4]">
           Register
@@ -181,5 +187,6 @@ export default function Signup() {
         </p>
       </div>
     </div>
+    </>
   );
 }

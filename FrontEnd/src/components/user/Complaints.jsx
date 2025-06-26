@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { useComplaints } from "./ComplaintContext";
+import React, { useState, useEffect } from "react";
 
 // Status badge component
 function StatusBadge({ status }) {
@@ -90,7 +89,6 @@ function ComplaintCard({ complaint, expandedComplaint, setExpandedComplaint, onM
             <div>
               <h4 className="font-medium text-[#06B6D4] mb-2">Complaint Details</h4>
               <p className="text-gray-300 mb-4">{complaint.fullDescription}</p>
-              {/* User Info */}
               <div className="mb-4">
                 <h4 className="font-medium text-[#06B6D4] mb-2">User Information</h4>
                 <ul className="text-gray-300 text-sm space-y-1">
@@ -142,10 +140,28 @@ function ComplaintCard({ complaint, expandedComplaint, setExpandedComplaint, onM
 }
 
 export default function Complaints() {
-  const { complaints } = useComplaints();
+  const [complaints, setComplaints] = useState([]);
   const [expandedComplaint, setExpandedComplaint] = useState(null);
   const [messageComplaint, setMessageComplaint] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  {/*useEffect(() => {
+    fetch("https://your-backend-api.com/complaints") 
+      .then((res) => res.json())
+      .then((data) => {
+        setComplaints(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to load complaints", err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return <div className="text-white text-center mt-20">Loading complaints...</div>;
+  }
+*/}
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 gap-4 mt-15">
@@ -163,6 +179,7 @@ export default function Complaints() {
           </div>
         </div>
       </div>
+
       <div className="grid grid-cols-1 gap-6">
         {complaints.length === 0 ? (
           <div className="text-center text-gray-400 py-24 text-xl">
@@ -180,6 +197,7 @@ export default function Complaints() {
           ))
         )}
       </div>
+
       <MessageModal
         open={!!messageComplaint}
         onClose={() => setMessageComplaint(null)}

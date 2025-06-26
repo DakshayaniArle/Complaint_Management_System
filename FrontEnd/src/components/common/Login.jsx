@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
+import ResolveNow from "./ResolveNow";
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "", usertype: "user" });
   const [showPassword, setShowPassword] = useState(false);
@@ -37,6 +37,8 @@ export default function Login() {
   };
 
   return (
+     <>
+        <ResolveNow/>
     <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
       <div className="w-full max-w-md bg-gray-800 rounded-lg shadow-lg p-8">
         <h2 className="text-3xl font-bold mb-6 text-center text-[#06B6D4]">Login</h2>
@@ -105,5 +107,6 @@ export default function Login() {
         </p>
       </div>
     </div>
+    </>
   );
 }

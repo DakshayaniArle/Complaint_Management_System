@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <>
     <ResolveNow/>
-      <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 md:px-12">
+      <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 md:px-12 mt-15">
         <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-6xl">
           {/* Text Section */}
           <div className="md:w-1/2 text-center md:text-left mb-10 md:mb-0">
