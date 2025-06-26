@@ -1,13 +1,33 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function SubmitComplaint() {
   const navigate = useNavigate();
   const formRef = useRef();
+  const [attachments, setAttachments] = useState([]);
+  const [errors, setErrors] = useState({});
+
+  const validate = (data) => {
+    const newErrors = {};
+
+    if (!data.name.trim()) newErrors.name = "Name is required.";
+    if (!data.email.trim()) newErrors.email = "Email is required.";
+    else if (!/\S+@\S+\.\S+/.test(data.email)) newErrors.email = "Invalid email format.";
+
+    if (!data.phone.trim()) newErrors.phone = "Phone number is required.";
+    else if (!/^\d{10}$/.test(data.phone)) newErrors.phone = "Phone must be 10 digits.";
+
+    if (!data.address.trim()) newErrors.address = "Address is required.";
+    if (!data.title.trim()) newErrors.title = "Complaint title is required.";
+    if (!data.description.trim()) newErrors.description = "Description is required.";
+
+    return newErrors;
+  };
 
   const handleSubmitComplaint = (e) => {
     e.preventDefault();
     const form = formRef.current;
+
     const data = {
       name: form.name.value,
       email: form.email.value,
@@ -16,114 +36,129 @@ export default function SubmitComplaint() {
       title: form.title.value,
       description: form.description.value,
       fullDescription: form.description.value,
-      attachments: [], 
+      attachments: attachments,
     };
 
-    
+    const validationErrors = validate(data);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
     console.log("Complaint Data:", data);
     alert("Complaint submitted successfully!");
     navigate("/user/complaints");
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <h2 className="text-3xl font-bold text-white mb-8">Submit a Complaint</h2>
-      <div className="bg-[#1F2937] rounded-xl shadow-md p-8 border-t-4 border-[#06B6D4]">
-        <form ref={formRef} onSubmit={handleSubmitComplaint} className="space-y-6">
-          {/* Personal Details */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="w-full px-4 py-10 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-white mb-8 text-center sm:text-left">
+          Submit a Complaint
+        </h2>
+
+        <div className="bg-[#1F2937] rounded-xl shadow-md p-6 sm:p-8 border-t-4 border-[#06B6D4]">
+          <form ref={formRef} onSubmit={handleSubmitComplaint} className="space-y-6">
+            {/* Personal Details */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {["name", "email", "phone", "address"].map((field) => (
+                <div key={field}>
+                  <label
+                    className="block text-[#06B6D4] font-medium mb-2"
+                    htmlFor={field}
+                  >
+                    {field.charAt(0).toUpperCase() + field.slice(1)}
+                  </label>
+                  <input
+                    type={field === "email" ? "email" : field === "phone" ? "tel" : "text"}
+                    id={field}
+                    name={field}
+                    className="w-full border border-[#06B6D4] rounded-lg px-4 py-2 bg-[#1F2937] text-white focus:outline-none focus:border-[#06B6D4]"
+                  />
+                  {errors[field] && (
+                    <p className="text-sm text-red-500 mt-1">{errors[field]}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Complaint Title */}
             <div>
-              <label className="block text-[#06B6D4] font-medium mb-2" htmlFor="name">
-                Name
+              <label className="block text-[#06B6D4] font-medium mb-2" htmlFor="title">
+                Complaint Title
               </label>
               <input
                 type="text"
-                id="name"
-                name="name"
-                className="w-full border border-[#06B6D4] rounded-lg px-4 py-2 focus:outline-none focus:border-[#06B6D4] bg-[#1F2937] text-white"
-                required
+                id="title"
+                name="title"
+                className="w-full border border-[#06B6D4] rounded-lg px-4 py-2 bg-[#1F2937] text-white focus:outline-none focus:border-[#06B6D4]"
               />
+              {errors.title && (
+                <p className="text-sm text-red-500 mt-1">{errors.title}</p>
+              )}
             </div>
+
+            {/* Description */}
             <div>
-              <label className="block text-[#06B6D4] font-medium mb-2" htmlFor="email">
-                Email
+              <label
+                className="block text-[#06B6D4] font-medium mb-2"
+                htmlFor="description"
+              >
+                Description
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                rows="4"
+                className="w-full border border-[#06B6D4] rounded-lg px-4 py-2 bg-[#1F2937] text-white focus:outline-none focus:border-[#06B6D4]"
+              ></textarea>
+              {errors.description && (
+                <p className="text-sm text-red-500 mt-1">{errors.description}</p>
+              )}
+            </div>
+
+            {/* Attachments */}
+            <div>
+              <label className="block text-[#06B6D4] font-medium mb-2">
+                Attachments (optional)
               </label>
               <input
-                type="email"
-                id="email"
-                name="email"
-                className="w-full border border-[#06B6D4] rounded-lg px-4 py-2 focus:outline-none focus:border-[#06B6D4] bg-[#1F2937] text-white"
-                required
+                type="file"
+                multiple
+                onChange={(e) => setAttachments([...e.target.files])}
+                className="block w-full text-white bg-[#1F2937] border border-[#06B6D4] rounded-lg px-4 py-2"
               />
+              {attachments.length > 0 && (
+                <p className="text-sm text-gray-400 mt-1">
+                  {attachments.length} file(s) selected
+                </p>
+              )}
             </div>
-            <div>
-              <label className="block text-[#06B6D4] font-medium mb-2" htmlFor="phone">
-                Phone
-              </label>
+
+            {/* Terms and Conditions */}
+            <div className="flex items-center">
               <input
-                type="tel"
-                id="phone"
-                name="phone"
-                className="w-full border border-[#06B6D4] rounded-lg px-4 py-2 focus:outline-none focus:border-[#06B6D4] bg-[#1F2937] text-white"
+                type="checkbox"
+                id="terms"
+                className="mr-2 accent-[#06B6D4]"
                 required
               />
-            </div>
-            <div>
-              <label className="block text-[#06B6D4] font-medium mb-2" htmlFor="address">
-                Address
+              <label htmlFor="terms" className="text-sm text-gray-200">
+                I agree to the terms and conditions and privacy policy
               </label>
-              <input
-                type="text"
-                id="address"
-                name="address"
-                className="w-full border border-[#06B6D4] rounded-lg px-4 py-2 focus:outline-none focus:border-[#06B6D4] bg-[#1F2937] text-white"
-                required
-              />
             </div>
-          </div>
-          {/* Complaint Title */}
-          <div>
-            <label className="block text-[#06B6D4] font-medium mb-2" htmlFor="title">
-              Complaint Title
-            </label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              className="w-full border border-[#06B6D4] rounded-lg px-4 py-2 focus:outline-none focus:border-[#06B6D4] bg-[#1F2937] text-white"
-              required
-            />
-          </div>
-          {/* Description */}
-          <div>
-            <label className="block text-[#06B6D4] font-medium mb-2" htmlFor="description">
-              Description
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              rows="4"
-              className="w-full border border-[#06B6D4] rounded-lg px-4 py-2 focus:outline-none focus:border-[#06B6D4] bg-[#1F2937] text-white"
-              required
-            ></textarea>
-          </div>
-          {/* Terms and conditions */}
-          <div className="flex items-center">
-            <input type="checkbox" id="terms" className="mr-2 accent-[#06B6D4]" required />
-            <label htmlFor="terms" className="text-sm text-gray-200">
-              I agree to the terms and conditions and privacy policy
-            </label>
-          </div>
-          {/* Action Buttons */}
-          <div className="flex justify-end space-x-4">
-            <button
-              type="submit"
-              className="bg-[#06B6D4] text-[#1F2937] px-6 py-3 rounded-lg font-medium hover:bg-[#0891B2] transition"
-            >
-              Submit Complaint
-            </button>
-          </div>
-        </form>
+
+            {/* Submit Button */}
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                className="bg-[#06B6D4] text-[#1F2937] px-6 py-3 rounded-lg font-medium hover:bg-[#0891B2] transition"
+              >
+                Submit Complaint
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
