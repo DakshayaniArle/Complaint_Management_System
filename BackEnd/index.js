@@ -15,7 +15,7 @@ app.use("/uploads",express.static("uploads"));
 const storage = multer.diskStorage({
     destination:"uploads/",
     filename:function(req,file,cb){
-        const uniqueSuffix = Date.now + "-"+file.originalname;
+        const uniqueSuffix = Date.now() + "-"+file.originalname;
         cb(null,uniqueSuffix);
     }
 })
@@ -72,11 +72,7 @@ app.post("/login",async (req,res)=>{
     }
     else{
         if(loggedUser.email=== email && password ===loggedUser.password){
-            res.status(200).json({
-                message:"Login successful",
-                email:loggedUser.email,
-                usertype:loggedUser.usertype,
-            });
+            res.status(200).json(loggedUser);
         }else{
             res.status(401).json({message:"Invalid credentials"})
         }
@@ -87,13 +83,14 @@ app.post("/login",async (req,res)=>{
    }
 })
 
-////////////////////////user complaint///////////
+//////////////////////// to store user complaint///////////
 app.post("/complaints",upload.array("attachments",5),async(req,res)=>{
+    console.log(req.body);
     try{
         const { userId, name, email, phone, address, title, description } = req.body;
         const filePaths = req.files.map((file) => file.path);
 
-         const complaint = new Complaint({
+         const complaint = new complaintModel({
       userId,
       name,
       email,
@@ -112,6 +109,18 @@ app.post("/complaints",upload.array("attachments",5),async(req,res)=>{
   }
 })
 
+////////to0 display complaint of user based on id////////
+app.get("/complaints/:id", async (req,res)=>{
+    try{
+         const userId = req.params.id;
+         const complaints = await complaintModel.find({userId : userId});
+         res.status(200).json(complaints);
+    }catch(err){
+        console.error("Error fetching complaints:",err);
+        res.status(500).json({err:"failed to fetch complaints"});
+    }
+   
+})
 
 
 app.listen(5000,()=>{

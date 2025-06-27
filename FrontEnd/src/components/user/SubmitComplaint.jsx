@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -24,30 +25,50 @@ export default function SubmitComplaint() {
     return newErrors;
   };
 
-  const handleSubmitComplaint = (e) => {
+  const handleSubmitComplaint = async (e) => {
     e.preventDefault();
     const form = formRef.current;
+    const user = JSON.parse(localStorage.getItem("userData"));
+    // console.log(user);
+    const loggedInUserId = user?._id;
+    const formData = new FormData();
+      formData.append("userId",loggedInUserId),
+      formData.append("name",form.name.value),
+      formData.append("email", form.email.value),
+      formData.append("phone",form.phone.value),
+      formData.append("address",form.address.value),
+      formData.append("title",form.title.value),
+      formData.append("description",form.description.value)
 
-    const data = {
-      name: form.name.value,
-      email: form.email.value,
-      phone: form.phone.value,
-      address: form.address.value,
-      title: form.title.value,
-      description: form.description.value,
-      fullDescription: form.description.value,
-      attachments: attachments,
-    };
+      const files = form.querySelector('input[type="file"]').files;
+      for(let i=0;i<files.length;i++){
+        formData.append("attachments",files[i]);
+      }
 
-    const validationErrors = validate(data);
+    const formObject = Object.fromEntries(formData.entries());
+    const validationErrors = validate(formObject);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-
-    console.log("Complaint Data:", data);
-    alert("Complaint submitted successfully!");
-    navigate("/user/complaints");
+    try{
+      const res = await fetch("http://localhost:5000/complaints",{
+        method:"POST",
+        body:formData
+      }); 
+      const data = await res.json();
+      if(res.ok){
+        alert("Complaint submitted successfully!");
+        navigate("/user/complaints");
+      }else{
+        alert("submission failed");
+      }
+    }catch(err){
+      console.log(err);
+      alert("Error while submitting complaint");
+    }
+    
+    
   };
 
   return (
