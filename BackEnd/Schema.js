@@ -15,20 +15,7 @@ const userSchema = mongoose.Schema({
  const userModel = mongoose.model("usersData",userSchema,"usersData");
 
  ////////////// Complaint Schema ///////////////////////////////
- const complaintSchema = mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
-    name:{type:String,required:true},
-    email:{type:String,required:true},
-    phone:{type:String,required:true},
-    address:{type:String,required:true},  
-    title:{type:String,required:true},
-    description:{type:String,required:true},
-    attachment:[String],
-    status:{type:String,default:"pending"},
-    createdAt:{type:String,default:Date.now},
- })
 
- const complaintModel = mongoose.model("complaintsData",complaintSchema,"complaintsData");
 
 
 module.exports = {userModel , complaintModel}

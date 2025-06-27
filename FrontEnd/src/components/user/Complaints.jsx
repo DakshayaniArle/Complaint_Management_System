@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { useComplaints } from "./ComplaintContext";
+import React, { useState, useEffect } from "react";
 
 // Status badge component
 function StatusBadge({ status }) {
@@ -29,8 +28,8 @@ function MessageModal({ open, onClose, complaint }) {
   const [message, setMessage] = useState("");
   if (!open || !complaint) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 mt-15">
-      <div className="bg-[#1F2937] rounded-lg p-8 max-w-md w-full shadow-xl relative">
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
+      <div className="bg-[#1F2937] rounded-lg p-6 sm:p-8 w-full max-w-md shadow-xl relative">
         <button onClick={onClose} className="absolute right-3 top-3 text-white text-lg">✕</button>
         <h3 className="text-xl font-bold text-[#06B6D4] mb-4">Message: {complaint.title}</h3>
         <textarea
@@ -41,7 +40,7 @@ function MessageModal({ open, onClose, complaint }) {
           onChange={e => setMessage(e.target.value)}
         />
         <button
-          className="bg-[#06B6D4] text-[#1F2937] px-6 py-2 rounded-lg font-bold hover:bg-[#0891B2] transition shadow-lg"
+          className="bg-[#06B6D4] text-[#1F2937] px-6 py-2 rounded-lg font-bold hover:bg-[#0891B2] transition shadow-lg w-full"
           onClick={() => {
             setMessage("");
             onClose();
@@ -58,16 +57,16 @@ function MessageModal({ open, onClose, complaint }) {
 function ComplaintCard({ complaint, expandedComplaint, setExpandedComplaint, onMessage }) {
   return (
     <div className="bg-[#1F2937] rounded-xl shadow-lg p-6 border-l-4 border-[#06B6D4] transition-all duration-300 hover:scale-[1.015] hover:shadow-2xl">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-start">
-        <div className="mb-4 md:mb-0">
-          <div className="flex items-center mb-2">
-            <h3 className="text-xl font-semibold text-white mr-3">{complaint.title}</h3>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+        <div>
+          <div className="flex flex-wrap items-center mb-2 gap-2">
+            <h3 className="text-xl font-semibold text-white">{complaint.title}</h3>
             <StatusBadge status={complaint.status} />
           </div>
           <p className="text-gray-300 mb-2">{complaint.description}</p>
           <p className="text-xs text-gray-400">{complaint.date}</p>
         </div>
-        <div className="flex space-x-3">
+        <div className="flex flex-wrap gap-3">
           <button
             onClick={() =>
               setExpandedComplaint(expandedComplaint === complaint.id ? null : complaint.id)
@@ -90,7 +89,6 @@ function ComplaintCard({ complaint, expandedComplaint, setExpandedComplaint, onM
             <div>
               <h4 className="font-medium text-[#06B6D4] mb-2">Complaint Details</h4>
               <p className="text-gray-300 mb-4">{complaint.fullDescription}</p>
-              {/* User Info */}
               <div className="mb-4">
                 <h4 className="font-medium text-[#06B6D4] mb-2">User Information</h4>
                 <ul className="text-gray-300 text-sm space-y-1">
@@ -103,7 +101,7 @@ function ComplaintCard({ complaint, expandedComplaint, setExpandedComplaint, onM
               {complaint.attachments && complaint.attachments.length > 0 && (
                 <div className="mb-4">
                   <h4 className="font-medium text-[#06B6D4] mb-2">Attachments</h4>
-                  <div className="flex space-x-2">
+                  <div className="flex flex-wrap gap-2">
                     {complaint.attachments.map((_, index) => (
                       <div
                         key={index}
@@ -142,13 +140,14 @@ function ComplaintCard({ complaint, expandedComplaint, setExpandedComplaint, onM
 }
 
 export default function Complaints() {
-  const { complaints } = useComplaints();
+  const [complaints, setComplaints] = useState([]);
   const [expandedComplaint, setExpandedComplaint] = useState(null);
   const [messageComplaint, setMessageComplaint] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   return (
-    <div>
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 gap-4 mt-15">
+    <div className="max-w-6xl mx-auto p-4 sm:p-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 gap-4">
         <h2 className="text-3xl font-bold text-white">My Complaints</h2>
         <div className="relative">
           <select className="block appearance-none bg-[#1F2937] border border-[#06B6D4] text-[#06B6D4] py-2 px-4 pr-8 rounded-full leading-tight focus:outline-none focus:border-[#06B6D4]">
@@ -163,8 +162,11 @@ export default function Complaints() {
           </div>
         </div>
       </div>
+
       <div className="grid grid-cols-1 gap-6">
-        {complaints.length === 0 ? (
+        {loading ? (
+          <div className="text-white text-center py-24 text-xl">Loading complaints...</div>
+        ) : complaints.length === 0 ? (
           <div className="text-center text-gray-400 py-24 text-xl">
             No complaints yet. Submit your first complaint!
           </div>
@@ -180,6 +182,7 @@ export default function Complaints() {
           ))
         )}
       </div>
+
       <MessageModal
         open={!!messageComplaint}
         onClose={() => setMessageComplaint(null)}
