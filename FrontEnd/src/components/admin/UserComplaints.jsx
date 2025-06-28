@@ -1,10 +1,9 @@
-// UserComplaints.jsx
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function UserComplaints() {
   const [complaints, setComplaints] = useState([]);
-  const [expandedId, setExpandedId] = useState(null);
+  const [expandedIds, setExpandedIds] = useState([]); // now an array
 
   useEffect(() => {
     fetch("http://localhost:5000/api/complaints")
@@ -16,6 +15,15 @@ export default function UserComplaints() {
   const handleAssign = (complaintId) => {
     alert(`Assigning complaint #${complaintId} to an agent...`);
     // dakshayani add your assign agent logic here
+  };
+
+  // Toggle function for expanded complaints
+  const handleToggleExpand = (complaintId) => {
+    setExpandedIds((prev) =>
+      prev.includes(complaintId)
+        ? prev.filter((id) => id !== complaintId)
+        : [...prev, complaintId]
+    );
   };
 
   return (
@@ -65,13 +73,13 @@ export default function UserComplaints() {
                     <td className="py-2">
                       <button
                         className="bg-gray-700 text-[#06B6D4] px-4 py-1 rounded-full font-medium hover:bg-[#0891B2] hover:text-white transition"
-                        onClick={() => setExpandedId(expandedId === complaint._id ? null : complaint._id)}
+                        onClick={() => handleToggleExpand(complaint._id)}
                       >
-                        {expandedId === complaint._id ? "Hide Info" : "More Info"}
+                        {expandedIds.includes(complaint._id) ? "Hide Info" : "More Info"}
                       </button>
                     </td>
                   </tr>
-                  {expandedId === complaint._id && (
+                  {expandedIds.includes(complaint._id) && (
                     <tr>
                       <td colSpan={7} className="bg-[#232B36] rounded-lg p-4 text-white">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
