@@ -18,7 +18,7 @@ export default function AgentComplaints() {
 
   useEffect(() => {
     const fetchComplaints = async () => {
-      const user = JSON.parse(localStorage.getItem("userData")); // Must have _id
+      // const user = JSON.parse(localStorage.getItem("userData")); // Must have _id
       try {
         const res = await fetch(`http://localhost:5000/agent/${user._id}/complaints`);
         const data = await res.json();
@@ -35,6 +35,7 @@ export default function AgentComplaints() {
 
   const handleLogout = () => {
     // Clear session data if needed
+    localStorage.removeItem(user);
     navigate("/login");
   };
 

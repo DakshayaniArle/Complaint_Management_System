@@ -1,12 +1,14 @@
 // AdminHome.jsx
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function AdminHome() {
   const [complaints, setComplaints] = useState([]);
   const [agents, setAgents] = useState([]);
   const [assignments, setAssignments] = useState([]);
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("userData"));
 
   useEffect(() => {
     fetch("http://localhost:5000/admin/complaints")
@@ -62,19 +64,23 @@ export default function AdminHome() {
   );
   return assignment ? assignment.agent : "Unassigned";
 };
+  const handleLogOut = ()=>{
+    localStorage.removeItem(user);
+    navigate('/login');
+  }
 
   return (
     <div className="bg-gray-900 min-h-screen text-white">
       <nav className="bg-gradient-to-r from-[#1F2937] to-[#06B6D4] text-white shadow-lg sticky top-0 z-40 py-3">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div className="flex items-center space-x-6">
-            <span className="text-xl font-bold tracking-wide">Admin</span>
+            <span className="text-xl font-bold tracking-wide">Hi,Admin {user.name}</span>
             <Link to="/admin" className="hover:text-[#06B6D4] font-medium transition">Home</Link>
             <Link to="/admin/agents" className="hover:text-[#06B6D4] font-medium transition">Agents</Link>
             <Link to="/admin/complaints" className="hover:text-[#06B6D4] font-medium transition">User Complaints</Link>
           </div>
           <button className="bg-white text-[#06B6D4] px-4 py-2 rounded-full font-medium hover:bg-[#06B6D4] hover:text-white border border-[#06B6D4] shadow transition"
-          onClick={()=>{ window.location.href='/login' }}>
+          onClick={handleLogOut}>
             Logout
           </button>
         </div>
