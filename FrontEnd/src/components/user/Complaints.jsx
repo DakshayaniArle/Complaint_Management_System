@@ -3,26 +3,33 @@ import React, { useState, useEffect } from "react";
 
 // Status badge component
 function StatusBadge({ status }) {
-  const getStatusColor = (status) => {
-    switch (status.toLowerCase()) {
-      case "In progress":
+
+  const normalized = typeof status === "string" ? status.toLowerCase() : "";
+
+  const getStatusColor = () => {
+    switch (normalized) {
+      case "in progress":
         return "bg-yellow-100 text-yellow-800";
       case "Resolved":
         return "bg-green-100 text-green-800";
-      case "Pending":
-        return "bg-[#06B6D4]/10 text-[#06B6D4]";
-      case "Rejected":
+      case "pending":
+        return "bg-blue-100 text-blue-800";
+      case "rejected":
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
   };
+
   return (
-    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(status)}`}>
+    <span
+      className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor()}`}
+    >
       {status}
     </span>
   );
 }
+
 
 // Simple modal for messaging
 function MessageModal({ open, onClose, complaint }) {

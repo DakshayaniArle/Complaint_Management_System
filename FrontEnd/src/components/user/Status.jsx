@@ -1,28 +1,29 @@
-import React, { useState } from "react";
-import { useComplaints } from "./ComplaintContext";
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 // Status badge component
 function StatusBadge({ status }) {
-  const getStatusColor = (status) => {
-    switch (status.toLowerCase()) {
-      case "In progress":
+
+  const normalized = typeof status === "string" ? status.toLowerCase() : "";
+
+  const getStatusColor = () => {
+    switch (normalized) {
+      case "in progress":
         return "bg-yellow-100 text-yellow-800";
       case "Resolved":
         return "bg-green-100 text-green-800";
-      case "Pending":
-        return "bg-[#06B6D4]/10 text-[#06B6D4]";
-      case "Rejected":
+      case "pending":
+        return "bg-blue-100 text-blue-800";
+      case "rejected":
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
   };
+
   return (
     <span
-      className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${getStatusColor(
-        status
-      )}`}
+      className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor()}`}
     >
       {status}
     </span>
@@ -30,31 +31,30 @@ function StatusBadge({ status }) {
 }
 
 export default function Status() {
-  // const { complaints } = useComplaints();
+
+  const [complaints, setComplaints] = useState([]);
   const [filter, setFilter] = useState("all");
-  const [complaints,setComplaints] = useState([]);
+
   const user = JSON.parse(localStorage.getItem("userData"));
   const userId = user?._id;
 
-  useEffect(()=>{
-      const fetchComplaints =  async ()=>{
-        try{
-          const res = await axios.get(`http://localhost:5000/complaints/${userId}`)
-          console.log(res.data);
-          setComplaints(res.data);
-        }catch(err){
-          console.error("failed to fetch the complaints data");
-        }
+  useEffect(() => {
+    const fetchComplaints = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/complaints/${userId}`);
+        setComplaints(res.data);
+      } catch (err) {
+        console.error("Failed to fetch complaints data", err);
       }
-      if(userId) fetchComplaints();
-    },[userId])
+    };
 
-
+    if (userId) fetchComplaints();
+  }, [userId]);
 
   const filteredComplaints =
     filter === "all"
       ? complaints
-      : complaints.filter((c) => c.status.toLowerCase() === filter);
+      : complaints.filter((c) => c.status.toLowerCase() === filter.toLowerCase());
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -78,7 +78,7 @@ export default function Status() {
         </select>
       </div>
 
-      {/* Complaints */}
+      {/* Complaints List */}
       {filteredComplaints.length === 0 ? (
         <div className="text-center text-gray-400 py-20 text-lg">
           No complaints to show.
@@ -87,13 +87,15 @@ export default function Status() {
         <div className="space-y-5">
           {filteredComplaints.map((complaint) => (
             <div
-              key={complaint.id}
+              key={complaint._id}
               className="bg-[#1F2937] rounded-xl shadow-md p-5 border-l-4 border-[#06B6D4] flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4"
             >
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-white">{complaint.title}</h3>
                 <p className="text-gray-300 mt-1">{complaint.description}</p>
-                <p className="text-xs text-gray-400 mt-1">{complaint.date}</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  {new Date(Number(complaint.createdAt)).toLocaleString()}
+                </p>
               </div>
               <div className="self-start sm:self-center">
                 <StatusBadge status={complaint.status} />
