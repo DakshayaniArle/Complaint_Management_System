@@ -5,7 +5,7 @@ const nodemailer = require("nodemailer");
 const path = require("path");
 const app = express();
 require("./config");
-const {userModel , complaintModel} = require("./Schema");
+const {userModel , complaintModel, assignModel} = require("./Schema");
 
 app.use(cors());
 app.use(express.json());
@@ -85,7 +85,7 @@ app.post("/login",async (req,res)=>{
 
 //////////////////////// to store user complaint///////////
 app.post("/complaints",upload.array("attachments",5),async(req,res)=>{
-    console.log(req.body);
+    // console.log(req.body);
     try{
         const { userId, name, email, phone, address, title, description } = req.body;
         const filePaths = req.files.map((file) => file.path);
@@ -121,6 +121,99 @@ app.get("/complaints/:id", async (req,res)=>{
     }
    
 })
+
+///////////to dsiplay all the complaints to the admin\\\\\\
+app.get("/admin/complaints",async (req,res)=>{
+    try{
+        const allComplaints = await complaintModel.find({});
+        res.status(200).json(allComplaints);
+    }catch(err){
+        console.error("error while fetching comaplints",err);
+        res.status(500).json("error while fetching comaplints");
+    }
+})
+
+///////////to display all the agents to the admin\\\\\
+app.get("/admin/agents",async (req,res)=>{
+    try{
+        const allAgents = await userModel.find({usertype:"agent"});
+        res.status(200).json(allAgents);
+    }catch(err){
+        console.error("error while fetching agents",err);
+        res.status(500).json("error while fetching agents")
+    }
+})
+////////////assign compliants to agents//////
+app.post("/assign",async (req,res)=>{
+    // console.log(req.body);
+    try{
+        const{agentId,complaintId,status,assignedAt} = req.body;
+
+        const agent = await userModel.findOne({_id:agentId});
+        // console.l;og(agent);
+        const assignment = new assignModel({
+            agentId,
+            complaintId,
+            status,
+            agent:agent.name,
+            assignedAt,
+        })
+        const newAssignment = await assignment.save();
+        res.status(200).json(agent);
+    }catch(err){
+        console.error("assignment failed",err);
+        res.status(500).json({message:"assignment failed"})
+    }
+    
+})
+
+/////////////////to get all the complaints assigened/////////
+app.get("/assignments", async (req, res) => {
+  try {
+    const assignments = await assignModel.find(); // Or populate if needed
+    res.status(200).json(assignments);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch assignments" });
+  }
+});
+
+//////////////complaints of an agent////////
+app.get("/agent/:id/complaints", async (req, res) => {
+  const agentId = req.params.id;
+  try {
+    const complaints = await assignModel
+      .find({ agentId })
+      .populate("complaintId");
+    res.status(200).json(complaints);
+  } catch (err) {
+    res.status(500).json({ error: "Error fetching assigned complaints" });
+  }
+});
+
+/////////////chnage status based on id //////////////////
+app.patch("/assign/status/:id", async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  try {
+    // Step 1: Update in assignModel
+    const assignment = await assignModel.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+
+    // Step 2: Also update in complaintModel
+    if (assignment?.complaintId) {
+      await complaintModel.findByIdAndUpdate(assignment.complaintId, { status });
+    }
+
+    res.status(200).json({ message: "Status updated", status });
+  } catch (error) {
+    console.error("Error updating status:", error);
+    res.status(500).json({ error: "Failed to update status" });
+  }
+});
+
 
 
 app.listen(5000,()=>{

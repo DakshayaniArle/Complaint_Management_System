@@ -5,7 +5,7 @@ export default function Agents() {
   const [agents, setAgents] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/agents")
+    fetch("http://localhost:5000/admin/agents")
       .then((res) => res.json())
       .then((data) => setAgents(data))
       .catch((err) => console.error("Error fetching agents:", err));
@@ -37,7 +37,7 @@ export default function Agents() {
                 <span className="font-semibold text-white">Email:</span> {agent.email}
               </p>
               <p className="text-gray-300 mb-1">
-                <span className="font-semibold text-white">Phone:</span> {agent.phone}
+                <span className="font-semibold text-white">AgentId:</span> {agent._id}
               </p>
               <p className="text-gray-300 mb-1">
                 <span className="font-semibold text-white">Profile:</span> {agent.profile || "-"}

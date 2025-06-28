@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 export default function UserComplaints() {
   const [complaints, setComplaints] = useState([]);
   const [expandedIds, setExpandedIds] = useState([]);
+  const [statusUpdates, setStatusUpdates] = useState({}); // Holds temporary status changes
 
   const fetchComplaints = () => {
     fetch("http://localhost:5000/api/complaints")
@@ -16,17 +17,38 @@ export default function UserComplaints() {
     fetchComplaints();
   }, []);
 
-  const handleAssign = (complaintId) => {
-    alert(`Assigning complaint #${complaintId} to an agent...`);
-    // TODO: Assign logic goes here
-  };
-
   const handleToggleExpand = (complaintId) => {
     setExpandedIds((prev) =>
       prev.includes(complaintId)
         ? prev.filter((id) => id !== complaintId)
         : [...prev, complaintId]
     );
+  };
+
+  const handleStatusChange = (id, newStatus) => {
+    setStatusUpdates((prev) => ({ ...prev, [id]: newStatus }));
+  };
+
+  const handleStatusUpdate = async (complaintId) => {
+    const newStatus = statusUpdates[complaintId];
+    if (!newStatus) return;
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/complaints/${complaintId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (res.ok) {
+        fetchComplaints();
+        alert("Status updated successfully!");
+      } else {
+        alert("Failed to update status.");
+      }
+    } catch (error) {
+      console.error("Update failed:", error);
+    }
   };
 
   return (
@@ -62,22 +84,34 @@ export default function UserComplaints() {
                   <tr className="border-b border-gray-700 text-white">
                     <td className="py-2">{complaint._id}</td>
                     <td className="py-2">{complaint.title}</td>
-                    <td className="py-2">{complaint.user}</td>
-                    <td className="py-2">{complaint.status}</td>
-                    <td className="py-2">{complaint.assignedTo || "Unassigned"}</td>
-                    <td className="py-2 space-x-2">
-                      <button
-                        className="bg-[#06B6D4] text-[#1F2937] px-4 py-1 rounded-full font-bold hover:bg-[#0891B2] transition"
-                        onClick={() => handleAssign(complaint._id)}
-                      >
-                        Assign
-                      </button>
-                      <button
-                        className="bg-green-600 text-white px-4 py-1 rounded-full font-bold hover:bg-green-700 transition"
-                        onClick={fetchComplaints}
-                      >
-                        Update
-                      </button>
+                    <td className="py-2">{complaint.name}</td>
+                    <td className="py-2">
+                      {complaint.status}
+                      <div className="mt-1">
+                        <select
+                          className="text-black px-2 py-1 rounded bg-white"
+                          value={statusUpdates[complaint._id] || ""}
+                          onChange={(e) =>
+                            handleStatusChange(complaint._id, e.target.value)
+                          }
+                        >
+                          <option value="">--Change Status--</option>
+                          <option value="Pending">Pending</option>
+                          <option value="In Progress">In Progress</option>
+                          <option value="Resolved">Resolved</option>
+                        </select>
+                        <button
+                          onClick={() => handleStatusUpdate(complaint._id)}
+                          className="ml-2 bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                        >
+                          Update
+                        </button>
+                      </div>
+                    </td>
+                    <td className="py-2">
+                      {complaint.assignedTo?.name || "Unassigned"}
+                    </td>
+                    <td className="py-2">
                       <button
                         className="bg-gray-700 text-[#06B6D4] px-4 py-1 rounded-full font-medium hover:bg-[#0891B2] hover:text-white transition"
                         onClick={() => handleToggleExpand(complaint._id)}
@@ -89,24 +123,24 @@ export default function UserComplaints() {
 
                   {expandedIds.includes(complaint._id) && (
                     <tr>
-                      <td colSpan={7} className="bg-[#232B36] rounded-lg p-4 text-white">
+                      <td colSpan={7} className="bg-[#232B36] p-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
                           <div>
                             <h4 className="font-semibold text-[#06B6D4] mb-2">User Details</h4>
                             <ul className="text-gray-200 text-sm space-y-1">
-                              <li><span className="font-semibold text-white">Name:</span> {complaint.name}</li>
-                              <li><span className="font-semibold text-white">Email:</span> {complaint.email}</li>
-                              <li><span className="font-semibold text-white">Phone:</span> {complaint.phone}</li>
-                              <li><span className="font-semibold text-white">Address:</span> {complaint.address}</li>
+                              <li><strong>Name:</strong> {complaint.name}</li>
+                              <li><strong>Email:</strong> {complaint.email}</li>
+                              <li><strong>Phone:</strong> {complaint.phone}</li>
+                              <li><strong>Address:</strong> {complaint.address}</li>
                             </ul>
                           </div>
                           <div>
                             <h4 className="font-semibold text-[#06B6D4] mb-2">Complaint Details</h4>
                             <ul className="text-gray-200 text-sm space-y-1">
-                              <li><span className="font-semibold text-white">Title:</span> {complaint.title}</li>
-                              <li><span className="font-semibold text-white">Description:</span> {complaint.description}</li>
-                              <li><span className="font-semibold text-white">Date:</span> {complaint.date}</li>
-                              <li><span className="font-semibold text-white">Status:</span> {complaint.status}</li>
+                              <li><strong>Title:</strong> {complaint.title}</li>
+                              <li><strong>Description:</strong> {complaint.description}</li>
+                              <li><strong>Date:</strong> {new Date(Number(complaint.createdAt)).toLocaleString()}</li>
+                              <li><strong>Status:</strong> {complaint.status}</li>
                             </ul>
                           </div>
                         </div>
