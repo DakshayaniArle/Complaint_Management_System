@@ -5,18 +5,31 @@ import { Link } from "react-router-dom";
 export default function UserComplaints() {
   const [complaints, setComplaints] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
+  const [assignments, setAssignments] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/complaints")
+    fetch("http://localhost:5000/admin/complaints")
       .then((res) => res.json())
       .then((data) => setComplaints(data))
       .catch((err) => console.error("Error fetching complaints:", err));
+    
+     fetch("http://localhost:5000/assignments") // create this endpoint if not exists
+    .then((res) => res.json())
+    .then((data) => setAssignments(data))
+    .catch((err) => console.error("Error fetching assignments:", err));
   }, []);
 
   const handleAssign = (complaintId) => {
     alert(`Assigning complaint #${complaintId} to an agent...`);
     // Implement agent assignment logic here
   };
+
+   const getAssignedAgentName = (complaintId) => {
+  const assignment = assignments.find(
+    (a) => a.complaintId === complaintId
+  );
+  return assignment ? assignment.agent : "Unassigned";
+};
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-white">
@@ -51,9 +64,9 @@ export default function UserComplaints() {
                   <tr className="border-b border-gray-700 text-white">
                     <td className="py-2">{complaint._id}</td>
                     <td className="py-2">{complaint.title}</td>
-                    <td className="py-2">{complaint.user}</td>
+                    <td className="py-2">{complaint.name}</td>
                     <td className="py-2">{complaint.status}</td>
-                    <td className="py-2">{complaint.assignedTo || "Unassigned"}</td>
+                    <td className="py-2">{getAssignedAgentName(complaint._id)}</td>
                     <td className="py-2">
                       <button
                         className="bg-[#06B6D4] text-[#1F2937] px-4 py-1 rounded-full font-bold hover:bg-[#0891B2] transition"
@@ -89,7 +102,7 @@ export default function UserComplaints() {
                             <ul className="text-gray-200 text-sm space-y-1">
                               <li><span className="font-semibold text-white">Title:</span> {complaint.title}</li>
                               <li><span className="font-semibold text-white">Description:</span> {complaint.description}</li>
-                              <li><span className="font-semibold text-white">Date:</span> {complaint.date}</li>
+                              <li><span className="font-semibold text-white">Date:</span> {new Date(Number(complaint.createdAt)).toLocaleString()}</li>
                               <li><span className="font-semibold text-white">Status:</span> {complaint.status}</li>
                             </ul>
                           </div>

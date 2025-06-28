@@ -2,24 +2,36 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const AGENT_NAME = "Agent Sarah";
+
 const AGENT_LOGO_URL = "https://ui-avatars.com/api/?name=Agent+Sarah&background=06B6D4&color=fff";
 const statusOptions = ["Pending", "In Progress", "Resolved", "Rejected"];
 
 export default function AgentComplaints() {
   const [complaints, setComplaints] = useState([]);
-  const [expandedId, setExpandedId] = useState(null);
+  const [expandedId, setExpandedId] = useState([]);
   const [messageInputs, setMessageInputs] = useState({});
   const [statusEditId, setStatusEditId] = useState(null);
   const [statusDrafts, setStatusDrafts] = useState({});
   const navigate = useNavigate();
+  const user =JSON.parse(localStorage.getItem("userData"));
+  const AGENT_NAME = user.name;
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/complaints")
-      .then((res) => res.json())
-      .then((data) => setComplaints(data))
-      .catch((err) => console.error("Error fetching complaints:", err));
+    const fetchComplaints = async () => {
+      const user = JSON.parse(localStorage.getItem("userData")); // Must have _id
+      try {
+        const res = await fetch(`http://localhost:5000/agent/${user._id}/complaints`);
+        const data = await res.json();
+        console.log(data);
+        setComplaints(data);
+      } catch (err) {
+        console.error("Failed to fetch complaints", err);
+      }
+    };
+
+    fetchComplaints();
   }, []);
+  
 
   const handleLogout = () => {
     // Clear session data if needed
@@ -31,40 +43,67 @@ export default function AgentComplaints() {
     setStatusDrafts((drafts) => ({ ...drafts, [id]: currentStatus }));
   };
 
-  const handleConfirmStatus = (id) => {
-    const updatedStatus = statusDrafts[id];
-    fetch(`http://localhost:5000/api/complaints/${id}`, {
+  // const handleConfirmStatus = (id) => {
+  //   const updatedStatus = statusDrafts[id];
+  //   fetch(`http://localhost:5000/api/complaints/${id}`, {
+  //     method: "PATCH",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({ status: updatedStatus }),
+  //   })
+  //     .then((res) => res.json())
+  //     .then((updatedComplaint) => {
+  //       setComplaints((prev) =>
+  //         prev.map((c) => (c._id === id ? updatedComplaint : c))
+  //       );
+  //       setStatusEditId(null);
+  //     });
+  // };
+
+
+  const handleConfirmStatus = async (assignId) => {
+  const updatedStatus = statusDrafts[assignId];
+  try {
+    const res = await fetch(`http://localhost:5000/assign/status/${assignId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: updatedStatus }),
-    })
-      .then((res) => res.json())
-      .then((updatedComplaint) => {
-        setComplaints((prev) =>
-          prev.map((c) => (c._id === id ? updatedComplaint : c))
-        );
-        setStatusEditId(null);
-      });
-  };
+    });
+    const updated = await res.json();
+    setComplaints((prev) =>
+      prev.map((c) => (c._id === assignId ? { ...c, status: updated.status } : c))
+    );
+    setStatusEditId(null);
+  } catch (err) {
+    console.error("Status update failed:", err);
+  }
+};
+
 
   const handleCancelStatus = () => setStatusEditId(null);
 
-  const handleSendMessage = (id) => {
-    const message = messageInputs[id]?.trim();
-    if (!message) return;
-    fetch(`http://localhost:5000/api/complaints/${id}/message`, {
+  const handleSendMessage = async (assignId) => {
+  const message = messageInputs[assignId]?.trim();
+  if (!message) return;
+
+  try {
+    const res = await fetch(`http://localhost:5000/assign/${assignId}/message`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: message, from: "agent" }),
-    })
-      .then((res) => res.json())
-      .then((updatedComplaint) => {
-        setComplaints((prev) =>
-          prev.map((c) => (c._id === id ? updatedComplaint : c))
-        );
-        setMessageInputs((inputs) => ({ ...inputs, [id]: "" }));
-      });
-  };
+      body: JSON.stringify({
+        text: message,
+        from: "agent",
+        timestamp: new Date().toLocaleString(),
+      }),
+    });
+    const updated = await res.json();
+    setComplaints((prev) =>
+      prev.map((c) => (c._id === assignId ? updated : c))
+    );
+    setMessageInputs((inputs) => ({ ...inputs, [assignId]: "" }));
+  } catch (err) {
+    console.error("Failed to send message:", err);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -100,12 +139,12 @@ export default function AgentComplaints() {
               <div key={complaint._id} className="bg-[#1F2937] rounded-xl shadow-md p-6 border-l-4 border-[#06B6D4]">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-lg font-semibold">{complaint.title}</h3>
+                    <h3 className="text-lg font-semibold">{complaint?.complaintId?.title}</h3>
                     <span className="inline-block mt-1 px-2 py-1 rounded-full text-xs bg-[#06B6D4]/10 text-[#06B6D4]">
                       {complaint.status}
                     </span>
-                    <p className="mt-2 text-sm"><span className="font-semibold">By:</span> {complaint.user}</p>
-                    <p className="text-xs text-gray-400">Date: {complaint.date}</p>
+                    <p className="mt-2 text-sm"><span className="font-semibold">By:</span> {complaint?.complaintId?.name}</p>
+                    <p className="text-xs text-gray-400">Date: {new Date(Number(complaint?.complaintId?.createdAt)).toLocaleString()}</p>
                   </div>
                   <div className="mt-1">
                     {statusEditId === complaint._id ? (
@@ -149,10 +188,10 @@ export default function AgentComplaints() {
                     <div>
                       <h4 className="font-semibold text-[#06B6D4] mb-2">User Details</h4>
                       <ul className="text-gray-300 space-y-1 mb-3">
-                        <li><b className="text-white">Name:</b> {complaint.name}</li>
-                        <li><b className="text-white">Email:</b> {complaint.email}</li>
-                        <li><b className="text-white">Phone:</b> {complaint.phone}</li>
-                        <li><b className="text-white">Address:</b> {complaint.address}</li>
+                        <li><b className="text-white">Name:</b> {complaint?.complaintId?.name}</li>
+                        <li><b className="text-white">Email:</b> {complaint?.complaintId?.email}</li>
+                        {/* <li><b className="text-white">Phone:</b> {complaint.phone}</li> */}
+                        <li><b className="text-white">Address:</b> {complaint?.complaintId?.address}</li>
                       </ul>
                     </div>
 

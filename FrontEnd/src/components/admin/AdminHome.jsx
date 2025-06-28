@@ -1,40 +1,67 @@
 // AdminHome.jsx
+import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 export default function AdminHome() {
   const [complaints, setComplaints] = useState([]);
   const [agents, setAgents] = useState([]);
+  const [assignments, setAssignments] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/complaints")
+    fetch("http://localhost:5000/admin/complaints")
       .then((res) => res.json())
       .then((data) => setComplaints(data))
       .catch((err) => console.error("Error fetching complaints:", err));
 
-    fetch("http://localhost:5000/api/agents")
+    fetch("http://localhost:5000/admin/agents")
       .then((res) => res.json())
       .then((data) => setAgents(data))
       .catch((err) => console.error("Error fetching agents:", err));
+
+    fetch("http://localhost:5000/assignments") // create this endpoint if not exists
+    .then((res) => res.json())
+    .then((data) => setAssignments(data))
+    .catch((err) => console.error("Error fetching assignments:", err));
   }, []);
 
-  const handleAssign = async (complaintId) => {
+  const handleAssign = async (complaint) => {
+    try{
     const agentId = prompt("Enter Agent ID to assign:");
     if (!agentId) return;
-    try {
-      const res = await fetch(`http://localhost:5000/api/complaints/${complaintId}/assign`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ agentId }),
-      });
-      const updated = await res.json();
-      setComplaints((prev) =>
-        prev.map((c) => (c._id === complaintId ? updated : c))
-      );
-    } catch (err) {
-      console.error("Failed to assign complaint:", err);
-    }
-  };
+
+    const assignData = {
+  agentId: agentId,
+  complaintId: complaint._id,
+  status: complaint.status,
+  assignedAt: Date.now(),
+};
+
+ const res = await fetch("http://localhost:5000/assign", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(assignData)
+ });
+ const data = await res.json();
+
+ alert("Complaint assigned to " + data.name);
+  }catch(err){
+    console.error("Failed to assign complaint",err);
+  }
+  }
+
+  const isAssigned = (complaintId) => {
+  return assignments.some((a) => a.complaintId === complaintId);
+};
+
+   const getAssignedAgentName = (complaintId) => {
+  const assignment = assignments.find(
+    (a) => a.complaintId === complaintId
+  );
+  return assignment ? assignment.agent : "Unassigned";
+};
 
   return (
     <div className="bg-gray-900 min-h-screen text-white">
@@ -76,14 +103,22 @@ export default function AdminHome() {
                     <tr key={complaint._id} className="border-b border-gray-700">
                       <td className="py-2">{complaint._id}</td>
                       <td className="py-2">{complaint.title}</td>
-                      <td className="py-2">{complaint.user}</td>
+                      <td className="py-2">{complaint.name}</td>
                       <td className="py-2">{complaint.status}</td>
-                      <td className="py-2">{complaint.assignedTo?.name || "Unassigned"}</td>
+                      <td className="py-2"> {getAssignedAgentName(complaint._id)}</td>
                       <td className="py-2">
-                        <button
+                        {isAssigned(complaint._id) ? (
+                          <button
                           className="bg-[#06B6D4] text-[#1F2937] px-3 py-1 rounded-full font-bold hover:bg-[#0891B2] transition"
-                          onClick={() => handleAssign(complaint._id)}
+                          disabled
+                        >Assigned</button>
+                        ) : (
+                          <button
+                          className="bg-[#06B6D4] text-[#1F2937] px-3 py-1 rounded-full font-bold hover:bg-[#0891B2] transition"
+                          onClick={() => handleAssign(complaint)}
                         >Assign</button>
+                        )}
+                        
                       </td>
                     </tr>
                   ))}
@@ -100,7 +135,7 @@ export default function AdminHome() {
               <div key={agent._id} className="bg-[#1F2937] rounded-xl shadow-md p-6 border-l-4 border-[#06B6D4]">
                 <h3 className="text-lg font-bold mb-2">{agent.name}</h3>
                 <p className="text-gray-300 mb-1"><span className="font-semibold text-white">Email:</span> {agent.email}</p>
-                <p className="text-gray-300 mb-1"><span className="font-semibold text-white">Phone:</span> {agent.phone}</p>
+                <p className="text-gray-300 mb-1"><span className="font-semibold text-white">AgentId:</span> {agent._id}</p>
                 <p className="text-gray-300"><span className="font-semibold text-white">Complaints Assigned:</span> {agent.complaints?.length || 0}</p>
               </div>
             ))}

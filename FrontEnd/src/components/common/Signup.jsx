@@ -19,10 +19,6 @@ export default function Signup() {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleTitle = (select) => {
-    setTitle(select);
-    setForm({ ...form, usertype: select });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,12 +76,15 @@ export default function Signup() {
                 id="usertype"
                 name="usertype"
                 value={form.usertype}
-                onChange={handleChange}
+                onChange={(e)=>{
+                  handleChange(e);
+                  setTitle(e.target.value);
+                }}
                 className="w-full px-4 py-2 rounded-lg bg-[#1F2937] border border-gray-700 text-[#06B6D4] focus:outline-none focus:ring-2 focus:ring-[#06B6D4]"
               >
-                <option value="user" onClick={() => handleTitle("user")}>User</option>
-                <option value="admin" onClick={() => handleTitle("admin")}>Admin</option>
-                <option value="agent" onClick={() => handleTitle("agent")}>Agent</option>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+                <option value="agent">Agent</option>
               </select>
             </div>
 

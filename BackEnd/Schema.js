@@ -30,5 +30,16 @@ const userSchema = mongoose.Schema({
 
  const complaintModel = mongoose.model("complaintsData",complaintSchema,"complaintsData");
 
+ const assignSchema =  mongoose.Schema({
+    agentId : {type: mongoose.Schema.Types.ObjectId, required: true, ref:"usersData"},
+    complaintId:{type: mongoose.Schema.Types.ObjectId, required: true, ref:"complaintsData"},
+    status:{type:String,required:true},
+    agent:{type:String,required:true},
+    assignedAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+ })
 
-module.exports = {userModel , complaintModel}
+ const assignModel = mongoose.model("assignData",assignSchema,"assignData")
+
+
+module.exports = {userModel , complaintModel,assignModel}
