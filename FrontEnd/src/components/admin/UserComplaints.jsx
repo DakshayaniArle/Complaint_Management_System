@@ -3,21 +3,24 @@ import { Link } from "react-router-dom";
 
 export default function UserComplaints() {
   const [complaints, setComplaints] = useState([]);
-  const [expandedIds, setExpandedIds] = useState([]); // now an array
+  const [expandedIds, setExpandedIds] = useState([]);
 
-  useEffect(() => {
+  const fetchComplaints = () => {
     fetch("http://localhost:5000/api/complaints")
       .then((res) => res.json())
       .then((data) => setComplaints(data))
       .catch((err) => console.error("Error fetching complaints:", err));
+  };
+
+  useEffect(() => {
+    fetchComplaints();
   }, []);
 
   const handleAssign = (complaintId) => {
     alert(`Assigning complaint #${complaintId} to an agent...`);
-    // dakshayani add your assign agent logic here
+    // TODO: Assign logic goes here
   };
 
-  // Toggle function for expanded complaints
   const handleToggleExpand = (complaintId) => {
     setExpandedIds((prev) =>
       prev.includes(complaintId)
@@ -37,6 +40,7 @@ export default function UserComplaints() {
           Back to Home
         </Link>
       </div>
+
       {complaints.length === 0 ? (
         <div className="text-gray-400">No complaints to show.</div>
       ) : (
@@ -49,8 +53,7 @@ export default function UserComplaints() {
                 <th className="py-2">User</th>
                 <th className="py-2">Status</th>
                 <th className="py-2">Assigned To</th>
-                <th className="py-2"></th>
-                <th className="py-2"></th>
+                <th className="py-2">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -62,15 +65,19 @@ export default function UserComplaints() {
                     <td className="py-2">{complaint.user}</td>
                     <td className="py-2">{complaint.status}</td>
                     <td className="py-2">{complaint.assignedTo || "Unassigned"}</td>
-                    <td className="py-2">
+                    <td className="py-2 space-x-2">
                       <button
                         className="bg-[#06B6D4] text-[#1F2937] px-4 py-1 rounded-full font-bold hover:bg-[#0891B2] transition"
                         onClick={() => handleAssign(complaint._id)}
                       >
                         Assign
                       </button>
-                    </td>
-                    <td className="py-2">
+                      <button
+                        className="bg-green-600 text-white px-4 py-1 rounded-full font-bold hover:bg-green-700 transition"
+                        onClick={fetchComplaints}
+                      >
+                        Update
+                      </button>
                       <button
                         className="bg-gray-700 text-[#06B6D4] px-4 py-1 rounded-full font-medium hover:bg-[#0891B2] hover:text-white transition"
                         onClick={() => handleToggleExpand(complaint._id)}
@@ -79,6 +86,7 @@ export default function UserComplaints() {
                       </button>
                     </td>
                   </tr>
+
                   {expandedIds.includes(complaint._id) && (
                     <tr>
                       <td colSpan={7} className="bg-[#232B36] rounded-lg p-4 text-white">
