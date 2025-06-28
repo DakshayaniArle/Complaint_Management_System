@@ -201,16 +201,32 @@ app.patch("/assign/status/:id", async (req, res) => {
       { status },
       { new: true }
     );
-
+    if (!assignment) {
+      return res.status(404).json({ error: "Assignment not found" });
+    }
     // Step 2: Also update in complaintModel
-    if (assignment?.complaintId) {
-      await complaintModel.findByIdAndUpdate(assignment.complaintId, { status });
+
+    const complaint =   await complaintModel.findByIdAndUpdate(assignment.complaintId, { status },{new:true});
+    
+
+    if (!complaint) {
+      return res.status(404).json({ error: "Complaint not found" });
     }
 
-    res.status(200).json({ message: "Status updated", status });
+    // Step 3: Send Email to the user
+    const mailOptions = {
+      from: "resolvenow.helpdesk@gamil.com",
+      to: complaint.email,
+      subject: `Your complaint status has been updated`,
+      text: `Hi ${complaint.name},\n\nYour complaint titled "${complaint.title}" is now marked as "${status}".\n\nThank you for using ResolveNow.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ message: "Status updated and Email sent", status });
   } catch (error) {
-    console.error("Error updating status:", error);
-    res.status(500).json({ error: "Failed to update status" });
+    console.error("Error updating status or sending mail:", error);
+    res.status(500).json({ error: "Failed to update status or sending mail" });
   }
 });
 

@@ -6,13 +6,13 @@ import { useEffect } from "react";
 function StatusBadge({ status }) {
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
-      case "in progress":
+      case "In progress":
         return "bg-yellow-100 text-yellow-800";
-      case "resolved":
+      case "Resolved":
         return "bg-green-100 text-green-800";
-      case "pending":
+      case "Pending":
         return "bg-[#06B6D4]/10 text-[#06B6D4]";
-      case "rejected":
+      case "Rejected":
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
@@ -30,8 +30,9 @@ function StatusBadge({ status }) {
 }
 
 export default function Status() {
-  const { complaints } = useComplaints();
+  // const { complaints } = useComplaints();
   const [filter, setFilter] = useState("all");
+  const [complaints,setComplaints] = useState([]);
   const user = JSON.parse(localStorage.getItem("userData"));
   const userId = user?._id;
 
@@ -39,6 +40,7 @@ export default function Status() {
       const fetchComplaints =  async ()=>{
         try{
           const res = await axios.get(`http://localhost:5000/complaints/${userId}`)
+          console.log(res.data);
           setComplaints(res.data);
         }catch(err){
           console.error("failed to fetch the complaints data");

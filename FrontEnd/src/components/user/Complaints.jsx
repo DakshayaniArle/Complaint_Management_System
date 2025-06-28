@@ -5,13 +5,13 @@ import React, { useState, useEffect } from "react";
 function StatusBadge({ status }) {
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
-      case "in progress":
+      case "In progress":
         return "bg-yellow-100 text-yellow-800";
-      case "resolved":
+      case "Resolved":
         return "bg-green-100 text-green-800";
-      case "pending":
+      case "Pending":
         return "bg-[#06B6D4]/10 text-[#06B6D4]";
-      case "rejected":
+      case "Rejected":
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
@@ -76,12 +76,12 @@ function ComplaintCard({ complaint, expandedComplaint, setExpandedComplaint, onM
           >
             {expandedComplaint === complaint.id ? "Hide Details" : "View Details"}
           </button>
-          <button
+          {/* <button
             className="bg-gray-700 text-gray-200 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition"
             onClick={() => onMessage(complaint)}
           >
             Message
-          </button>
+          </button> */}
         </div>
       </div>
       {expandedComplaint === complaint.id && (
@@ -202,11 +202,11 @@ export default function Complaints() {
         )}
       </div>
 
-      <MessageModal
+      {/* <MessageModal
         open={!!messageComplaint}
         onClose={() => setMessageComplaint(null)}
         complaint={messageComplaint}
-      />
+      /> */}
     </div>
   );
 }
