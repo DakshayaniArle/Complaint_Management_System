@@ -3,12 +3,14 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const BG_DARK = "bg-[#1F2937]";
 const ACCENT = "text-[#06B6D4]";
-const USERNAME = "John Doe";
+
 
 export default function Navbar() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const user = JSON.parse(localStorage.getItem("userData"));
+  const USERNAME = user.name;
 
   const handleLogout = () => {
     navigate("/login");

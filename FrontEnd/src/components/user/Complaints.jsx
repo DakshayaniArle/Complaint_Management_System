@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState, useEffect } from "react";
 
 // Status badge component
@@ -64,7 +65,7 @@ function ComplaintCard({ complaint, expandedComplaint, setExpandedComplaint, onM
             <StatusBadge status={complaint.status} />
           </div>
           <p className="text-gray-300 mb-2">{complaint.description}</p>
-          <p className="text-xs text-gray-400">{complaint.date}</p>
+          <p className="text-xs text-gray-400">{new Date(Number(complaint.createdAt)).toLocaleString()}</p>
         </div>
         <div className="flex flex-wrap gap-3">
           <button
@@ -88,7 +89,7 @@ function ComplaintCard({ complaint, expandedComplaint, setExpandedComplaint, onM
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h4 className="font-medium text-[#06B6D4] mb-2">Complaint Details</h4>
-              <p className="text-gray-300 mb-4">{complaint.fullDescription}</p>
+              <p className="text-gray-300 mb-4">{complaint.description}</p>
               <div className="mb-4">
                 <h4 className="font-medium text-[#06B6D4] mb-2">User Information</h4>
                 <ul className="text-gray-300 text-sm space-y-1">
@@ -107,7 +108,11 @@ function ComplaintCard({ complaint, expandedComplaint, setExpandedComplaint, onM
                         key={index}
                         className="w-20 h-20 bg-gray-800 rounded-md flex items-center justify-center"
                       >
-                        📷
+                        <img 
+                           src={`http://localhost:5000/${complaint.attachments[0]}`}
+                           alt="📷"
+                           className="w-full h-full object-cover" 
+                        />
                       </div>
                     ))}
                   </div>
@@ -144,6 +149,20 @@ export default function Complaints() {
   const [expandedComplaint, setExpandedComplaint] = useState(null);
   const [messageComplaint, setMessageComplaint] = useState(null);
   const [loading, setLoading] = useState(false);
+  const user = JSON.parse(localStorage.getItem("userData"));
+  const userId = user?._id;
+
+  useEffect(()=>{
+    const fetchComplaints =  async ()=>{
+      try{
+        const res = await axios.get(`http://localhost:5000/complaints/${userId}`)
+        setComplaints(res.data);
+      }catch(err){
+        console.error("failed to fetch the complaints data");
+      }
+    }
+    if(userId) fetchComplaints();
+  },[userId])
 
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-8">
@@ -173,7 +192,7 @@ export default function Complaints() {
         ) : (
           complaints.map((complaint) => (
             <ComplaintCard
-              key={complaint.id}
+              key={complaint._id}
               complaint={complaint}
               expandedComplaint={expandedComplaint}
               setExpandedComplaint={setExpandedComplaint}

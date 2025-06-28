@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useComplaints } from "./ComplaintContext";
+import { useEffect } from "react";
 
 // Status badge component
 function StatusBadge({ status }) {
@@ -31,6 +32,22 @@ function StatusBadge({ status }) {
 export default function Status() {
   const { complaints } = useComplaints();
   const [filter, setFilter] = useState("all");
+  const user = JSON.parse(localStorage.getItem("userData"));
+  const userId = user?._id;
+
+  useEffect(()=>{
+      const fetchComplaints =  async ()=>{
+        try{
+          const res = await axios.get(`http://localhost:5000/complaints/${userId}`)
+          setComplaints(res.data);
+        }catch(err){
+          console.error("failed to fetch the complaints data");
+        }
+      }
+      if(userId) fetchComplaints();
+    },[userId])
+
+
 
   const filteredComplaints =
     filter === "all"

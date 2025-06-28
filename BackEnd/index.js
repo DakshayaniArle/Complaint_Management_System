@@ -1,12 +1,26 @@
 const express = require("express");
 const cors = require("cors");
+const multer = require("multer");
 const nodemailer = require("nodemailer");
+const path = require("path");
 const app = express();
 require("./config");
-const {userModel} = require("./Schema");
+const {userModel , complaintModel} = require("./Schema");
 
 app.use(cors());
 app.use(express.json());
+app.use("/uploads",express.static("uploads"));
+
+//configure multer
+const storage = multer.diskStorage({
+    destination:"uploads/",
+    filename:function(req,file,cb){
+        const uniqueSuffix = Date.now() + "-"+file.originalname;
+        cb(null,uniqueSuffix);
+    }
+})
+
+const upload = multer({storage})
 
 const transporter = nodemailer.createTransport({
     service:"gmail",
@@ -15,7 +29,6 @@ const transporter = nodemailer.createTransport({
         pass:"noqu nrgm rgdg mtam",
     }
 })
-
 
 ////////////////SignUp of user////////////
 app.post("/SignUp",async (req,res)=>{
@@ -59,11 +72,7 @@ app.post("/login",async (req,res)=>{
     }
     else{
         if(loggedUser.email=== email && password ===loggedUser.password){
-            res.status(200).json({
-                message:"Login successful",
-                email:loggedUser.email,
-                usertype:loggedUser.usertype,
-            });
+            res.status(200).json(loggedUser);
         }else{
             res.status(401).json({message:"Invalid credentials"})
         }
@@ -74,6 +83,44 @@ app.post("/login",async (req,res)=>{
    }
 })
 
+//////////////////////// to store user complaint///////////
+app.post("/complaints",upload.array("attachments",5),async(req,res)=>{
+    console.log(req.body);
+    try{
+        const { userId, name, email, phone, address, title, description } = req.body;
+        const filePaths = req.files.map((file) => file.path);
+
+         const complaint = new complaintModel({
+      userId,
+      name,
+      email,
+      phone,
+      address,
+      title,
+      description,
+      attachments: filePaths,
+    });
+
+    const savedComplaint = await complaint.save();
+    res.status(201).json({ message: "Complaint submitted", savedComplaint });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+})
+
+////////to0 display complaint of user based on id////////
+app.get("/complaints/:id", async (req,res)=>{
+    try{
+         const userId = req.params.id;
+         const complaints = await complaintModel.find({userId : userId});
+         res.status(200).json(complaints);
+    }catch(err){
+        console.error("Error fetching complaints:",err);
+        res.status(500).json({err:"failed to fetch complaints"});
+    }
+   
+})
 
 
 app.listen(5000,()=>{
