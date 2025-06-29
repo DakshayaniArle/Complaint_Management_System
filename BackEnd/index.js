@@ -170,7 +170,7 @@ app.post("/assign",async (req,res)=>{
 /////////////////to get all the complaints assigened/////////
 app.get("/assignments", async (req, res) => {
   try {
-    const assignments = await assignModel.find(); // Or populate if needed
+    const assignments = await assignModel.find(); 
     res.status(200).json(assignments);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch assignments" });
@@ -227,6 +227,17 @@ app.patch("/assign/status/:id", async (req, res) => {
   } catch (error) {
     console.error("Error updating status or sending mail:", error);
     res.status(500).json({ error: "Failed to update status or sending mail" });
+  }
+});
+
+////////Get number of complaints assigned to a specific agent///
+app.get("/admin/agents/:id/complaint-count", async (req, res) => {
+  try {
+    const agentId = req.params.id;
+    const count = await assignModel.countDocuments({ agentId });
+    res.status(200).json({ count });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch count" });
   }
 });
 

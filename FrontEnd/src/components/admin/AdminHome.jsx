@@ -7,31 +7,58 @@ export default function AdminHome() {
   const [complaints, setComplaints] = useState([]);
   const [agents, setAgents] = useState([]);
   const [assignments, setAssignments] = useState([]);
+  const [noOfComplaints,setNoOfComplaints] = useState(0);
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("userData"));
 
   useEffect(() => {
-    fetch("http://localhost:5000/admin/complaints")
-      .then((res) => res.json())
-      .then((data) => setComplaints(data))
-      .catch((err) => console.error("Error fetching complaints:", err));
-
+    const fetchComplaints = async () => {
+    try{
+      const res = await fetch("http://localhost:5000/admin/complaints");
+     const data = await res.json();
+     console.log(data);
+     const unresolved = data.filter(
+        (assignment) => assignment.status !== "Resolved"
+      );
+      console.log(unresolved);
+      setComplaints(unresolved);
+    }catch{(err) => console.error("Error fetching complaints:", err)};
+    }
     fetch("http://localhost:5000/admin/agents")
       .then((res) => res.json())
       .then((data) => setAgents(data))
       .catch((err) => console.error("Error fetching agents:", err));
 
-    fetch("http://localhost:5000/assignments") // create this endpoint if not exists
+    fetch("http://localhost:5000/assignments") 
     .then((res) => res.json())
     .then((data) => setAssignments(data))
     .catch((err) => console.error("Error fetching assignments:", err));
+
+    fetch("http://localhost:5000/admin/agents")
+    .then((res) => res.json())
+    .then((agentsData) => {
+      // For each agent, fetch their assigned complaint count
+      Promise.all(
+        agentsData.map(async (agent) => {
+          const res = await fetch(`http://localhost:5000/admin/agents/${agent._id}/complaint-count`);
+          const { count } = await res.json();
+          return { ...agent, assignedCount: count };
+        })
+      ).then((agentsWithCounts) => {
+        const complaintsCountMap = {};
+        agentsWithCounts.forEach(agent => {
+            complaintsCountMap[agent._id] = agent.assignedCount;
+        });
+        setNoOfComplaints(complaintsCountMap);
+      });
+    })
+    fetchComplaints();
   }, []);
 
   const handleAssign = async (complaint) => {
     try{
     const agentId = prompt("Enter Agent ID to assign:");
     if (!agentId) return;
-
     const assignData = {
   agentId: agentId,
   complaintId: complaint._id,
@@ -77,7 +104,7 @@ export default function AdminHome() {
             <span className="text-xl font-bold tracking-wide">Hi,Admin {user.name}</span>
             <Link to="/admin" className="hover:text-[#06B6D4] font-medium transition">Home</Link>
             <Link to="/admin/agents" className="hover:text-[#06B6D4] font-medium transition">Agents</Link>
-            <Link to="/admin/complaints" className="hover:text-[#06B6D4] font-medium transition">User Complaints</Link>
+            <Link to="/admin/complaints" className="hover:text-[#06B6D4] font-medium transition">Overall Data</Link>
           </div>
           <button className="bg-white text-[#06B6D4] px-4 py-2 rounded-full font-medium hover:bg-[#06B6D4] hover:text-white border border-[#06B6D4] shadow transition"
           onClick={handleLogOut}>
@@ -89,7 +116,7 @@ export default function AdminHome() {
       <div className="max-w-6xl mx-auto py-10 px-4 space-y-12">
         <section>
           <h2 className="text-2xl font-bold mb-6">User Complaints</h2>
-          {complaints.length === 0 ? (
+          {complaints.length === 0  ? (
             <div className="text-gray-400">No complaints to show.</div>
           ) : (
             <div className="bg-[#1F2937] rounded-xl shadow-md p-6 overflow-x-auto">
@@ -142,7 +169,7 @@ export default function AdminHome() {
                 <h3 className="text-lg font-bold mb-2">{agent.name}</h3>
                 <p className="text-gray-300 mb-1"><span className="font-semibold text-white">Email:</span> {agent.email}</p>
                 <p className="text-gray-300 mb-1"><span className="font-semibold text-white">AgentId:</span> {agent._id}</p>
-                <p className="text-gray-300"><span className="font-semibold text-white">Complaints Assigned:</span> {agent.complaints?.length || 0}</p>
+                <p className="text-gray-300"><span className="font-semibold text-white">Complaints Assigned:</span> {noOfComplaints[agent._id]||0}</p>
               </div>
             ))}
           </div>

@@ -3,12 +3,32 @@ import { Link } from "react-router-dom";
 
 export default function Agents() {
   const [agents, setAgents] = useState([]);
+  const [noOfComplaints,setNoOfComplaints] = useState(0);
 
   useEffect(() => {
     fetch("http://localhost:5000/admin/agents")
       .then((res) => res.json())
       .then((data) => setAgents(data))
       .catch((err) => console.error("Error fetching agents:", err));
+
+    fetch("http://localhost:5000/admin/agents")
+    .then((res) => res.json())
+    .then((agentsData) => {
+      // For each agent, fetch their assigned complaint count
+      Promise.all(
+        agentsData.map(async (agent) => {
+          const res = await fetch(`http://localhost:5000/admin/agents/${agent._id}/complaint-count`);
+          const { count } = await res.json();
+          return { ...agent, assignedCount: count };
+        })
+      ).then((agentsWithCounts) => {
+        const complaintsCountMap = {};
+        agentsWithCounts.forEach(agent => {
+            complaintsCountMap[agent._id] = agent.assignedCount;
+        });
+        setNoOfComplaints(complaintsCountMap);
+      });
+    })
   }, []);
 
   return (
@@ -39,12 +59,9 @@ export default function Agents() {
               <p className="text-gray-300 mb-1">
                 <span className="font-semibold text-white">AgentId:</span> {agent._id}
               </p>
-              <p className="text-gray-300 mb-1">
-                <span className="font-semibold text-white">Profile:</span> {agent.profile || "-"}
-              </p>
               <p className="text-gray-300">
-                <span className="font-semibold text-white">Complaints Assigned:</span>{" "}
-                {agent.complaints || 0}
+                <span className="font-semibold text-white">Complaints Assigned:</span>{" "} {noOfComplaints[agent._id]||0}
+  
               </p>
             </div>
           ))}

@@ -10,7 +10,7 @@ function StatusBadge({ status }) {
     switch (normalized) {
       case "in progress":
         return "bg-yellow-100 text-yellow-800";
-      case "Resolved":
+      case "resolved":
         return "bg-green-100 text-green-800";
       case "pending":
         return "bg-blue-100 text-blue-800";

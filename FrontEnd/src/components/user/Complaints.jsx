@@ -10,7 +10,7 @@ function StatusBadge({ status }) {
     switch (normalized) {
       case "in progress":
         return "bg-yellow-100 text-yellow-800";
-      case "Resolved":
+      case "resolved":
         return "bg-green-100 text-green-800";
       case "pending":
         return "bg-blue-100 text-blue-800";
@@ -156,6 +156,7 @@ export default function Complaints() {
   const [expandedComplaint, setExpandedComplaint] = useState(null);
   const [messageComplaint, setMessageComplaint] = useState(null);
   const [loading, setLoading] = useState(false);
+   const [filter, setFilter] = useState("all");
   const user = JSON.parse(localStorage.getItem("userData"));
   const userId = user?._id;
 
@@ -171,17 +172,25 @@ export default function Complaints() {
     if(userId) fetchComplaints();
   },[userId])
 
+  const filteredComplaints =
+    filter === "all"
+      ? complaints
+      : complaints.filter((c) => c.status.toLowerCase() === filter.toLowerCase());
+
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 gap-4">
         <h2 className="text-3xl font-bold text-white">My Complaints</h2>
         <div className="relative">
-          <select className="block appearance-none bg-[#1F2937] border border-[#06B6D4] text-[#06B6D4] py-2 px-4 pr-8 rounded-full leading-tight focus:outline-none focus:border-[#06B6D4]">
-            <option>All Statuses</option>
-            <option>Pending</option>
-            <option>In Progress</option>
-            <option>Resolved</option>
-            <option>Rejected</option>
+          <select className="block appearance-none bg-[#1F2937] border border-[#06B6D4] text-[#06B6D4] py-2 px-4 pr-8 rounded-full leading-tight focus:outline-none focus:border-[#06B6D4]"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          >
+           <option value="all">All</option>
+          <option value="pending">Pending</option>
+          <option value="in progress">In Progress</option>
+          <option value="resolved">Resolved</option>
+          <option value="rejected">Rejected</option>
           </select>
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[#06B6D4]">
             <span>▼</span>
@@ -192,12 +201,12 @@ export default function Complaints() {
       <div className="grid grid-cols-1 gap-6">
         {loading ? (
           <div className="text-white text-center py-24 text-xl">Loading complaints...</div>
-        ) : complaints.length === 0 ? (
+        ) : filteredComplaints.length === 0 ? (
           <div className="text-center text-gray-400 py-24 text-xl">
             No complaints yet. Submit your first complaint!
           </div>
         ) : (
-          complaints.map((complaint) => (
+          filteredComplaints.map((complaint) => (
             <ComplaintCard
               key={complaint._id}
               complaint={complaint}

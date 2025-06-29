@@ -4,16 +4,23 @@ import { Link } from "react-router-dom";
 export default function UserComplaints() {
   const [complaints, setComplaints] = useState([]);
   const [expandedIds, setExpandedIds] = useState([]);
-  const [statusUpdates, setStatusUpdates] = useState({}); // Holds temporary status changes
+  const [assignments, setAssignments] = useState([]);
+  const [filter, setFilter] = useState("all");
+  const [agentFilter, setAgentFilter] = useState("all");
+  
 
   const fetchComplaints = () => {
-    fetch("http://localhost:5000/api/complaints")
+    fetch("http://localhost:5000/admin/complaints")
       .then((res) => res.json())
-      .then((data) => setComplaints(data))
+      .then((data) => {setComplaints(data)})
       .catch((err) => console.error("Error fetching complaints:", err));
   };
 
   useEffect(() => {
+     fetch("http://localhost:5000/assignments") 
+    .then((res) => res.json())
+    .then((data) => setAssignments(data))
+    .catch((err) => console.error("Error fetching assignments:", err));
     fetchComplaints();
   }, []);
 
@@ -25,31 +32,25 @@ export default function UserComplaints() {
     );
   };
 
-  const handleStatusChange = (id, newStatus) => {
-    setStatusUpdates((prev) => ({ ...prev, [id]: newStatus }));
-  };
+    const getAssignedAgentName = (complaintId) => {
+  const assignment = assignments.find(
+    (a) => a.complaintId === complaintId
+  );
+  return assignment ? assignment.agent : "Unassigned";
+};
 
-  const handleStatusUpdate = async (complaintId) => {
-    const newStatus = statusUpdates[complaintId];
-    if (!newStatus) return;
+    const filteredComplaints = complaints.filter((c) => {
+  const matchStatus =
+    filter === "all" || c.status.toLowerCase() === filter.toLowerCase();
 
-    try {
-      const res = await fetch(`http://localhost:5000/api/complaints/${complaintId}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
-      });
+  const assignedAgent = getAssignedAgentName(c._id);
+  const matchAgent =
+    agentFilter === "all" || assignedAgent === agentFilter;
 
-      if (res.ok) {
-        fetchComplaints();
-        alert("Status updated successfully!");
-      } else {
-        alert("Failed to update status.");
-      }
-    } catch (error) {
-      console.error("Update failed:", error);
-    }
-  };
+  return matchStatus && matchAgent;
+});
+
+
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-white">
@@ -63,7 +64,41 @@ export default function UserComplaints() {
         </Link>
       </div>
 
-      {complaints.length === 0 ? (
+    <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+  <div className="flex flex-col sm:flex-row items-center gap-4">
+    <label className="text-[#06B6D4] font-medium">Filter by Status:</label>
+    <select
+      className="bg-[#1F2937] border border-[#06B6D4] text-[#06B6D4] py-2 px-4 rounded-full focus:outline-none"
+      value={filter}
+      onChange={(e) => setFilter(e.target.value)}
+    >
+      <option value="all">All</option>
+      <option value="pending">Pending</option>
+      <option value="in progress">In Progress</option>
+      <option value="resolved">Resolved</option>
+      <option value="rejected">Rejected</option>
+    </select>
+  </div>
+
+  <div className="flex flex-col sm:flex-row items-center gap-4">
+    <label className="text-[#06B6D4] font-medium">Filter by Agent:</label>
+    <select
+      className="bg-[#1F2937] border border-[#06B6D4] text-[#06B6D4] py-2 px-4 rounded-full focus:outline-none"
+      value={agentFilter}
+      onChange={(e) => setAgentFilter(e.target.value)}
+    >
+      <option value="all">All</option>
+      {
+        [...new Set(assignments.map((a) => a.agent))].map((agent) => (
+          <option key={agent} value={agent}>{agent}</option>
+        ))
+      }
+    </select>
+  </div>
+</div>
+
+
+      {filteredComplaints.length === 0 ? (
         <div className="text-gray-400">No complaints to show.</div>
       ) : (
         <div className="bg-[#1F2937] rounded-xl shadow-md p-6 overflow-x-auto">
@@ -79,37 +114,15 @@ export default function UserComplaints() {
               </tr>
             </thead>
             <tbody>
-              {complaints.map((complaint) => (
+              {filteredComplaints.map((complaint) => (
                 <React.Fragment key={complaint._id}>
                   <tr className="border-b border-gray-700 text-white">
                     <td className="py-2">{complaint._id}</td>
                     <td className="py-2">{complaint.title}</td>
                     <td className="py-2">{complaint.name}</td>
+                    <td className="py-2">{complaint.status}</td>
                     <td className="py-2">
-                      {complaint.status}
-                      <div className="mt-1">
-                        <select
-                          className="text-black px-2 py-1 rounded bg-white"
-                          value={statusUpdates[complaint._id] || ""}
-                          onChange={(e) =>
-                            handleStatusChange(complaint._id, e.target.value)
-                          }
-                        >
-                          <option value="">--Change Status--</option>
-                          <option value="Pending">Pending</option>
-                          <option value="In Progress">In Progress</option>
-                          <option value="Resolved">Resolved</option>
-                        </select>
-                        <button
-                          onClick={() => handleStatusUpdate(complaint._id)}
-                          className="ml-2 bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-                        >
-                          Update
-                        </button>
-                      </div>
-                    </td>
-                    <td className="py-2">
-                      {complaint.assignedTo?.name || "Unassigned"}
+                     {getAssignedAgentName(complaint._id)}
                     </td>
                     <td className="py-2">
                       <button

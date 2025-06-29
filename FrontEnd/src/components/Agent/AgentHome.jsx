@@ -2,10 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-
-const AGENT_LOGO_URL = "https://ui-avatars.com/api/?name=Agent+Sarah&background=06B6D4&color=fff";
-const statusOptions = ["Pending", "In Progress", "Resolved", "Rejected"];
-
 export default function AgentComplaints() {
   const [complaints, setComplaints] = useState([]);
   const [expandedId, setExpandedId] = useState([]);
@@ -13,8 +9,12 @@ export default function AgentComplaints() {
   const [statusEditId, setStatusEditId] = useState(null);
   const [statusDrafts, setStatusDrafts] = useState({});
   const navigate = useNavigate();
+
   const user =JSON.parse(localStorage.getItem("userData"));
   const AGENT_NAME = user.name;
+  const AGENT_LOGO_URL = "https://ui-avatars.com/api/?name=Agent+Sarah&background=06B6D4&color=fff";
+  const statusOptions = ["Pending", "In Progress", "Resolved", "Rejected"];
+  
 
   useEffect(() => {
     const fetchComplaints = async () => {
@@ -147,35 +147,57 @@ export default function AgentComplaints() {
                     <p className="mt-2 text-sm"><span className="font-semibold">By:</span> {complaint?.complaintId?.name}</p>
                     <p className="text-xs text-gray-400">Date: {new Date(Number(complaint?.complaintId?.createdAt)).toLocaleString()}</p>
                   </div>
-                  <div className="mt-1">
-                    {statusEditId === complaint._id ? (
-                      <div className="flex flex-col items-end space-y-2">
-                        <select
-                          className="bg-[#232B36] text-white border border-[#06B6D4] rounded py-1 px-2"
-                          value={statusDrafts[complaint._id]}
-                          onChange={(e) =>
-                            setStatusDrafts((drafts) => ({
-                              ...drafts,
-                              [complaint._id]: e.target.value,
-                            }))
-                          }
-                        >
-                          {statusOptions.map((status) => (
-                            <option key={status} value={status}>{status}</option>
-                          ))}
-                        </select>
-                        <div className="flex gap-2">
-                          <button onClick={() => handleConfirmStatus(complaint._id)} className="bg-[#06B6D4] text-[#1F2937] px-2 py-1 text-xs rounded hover:bg-[#0891B2]">Save</button>
-                          <button onClick={handleCancelStatus} className="bg-gray-600 text-white px-2 py-1 text-xs rounded hover:bg-gray-700">Cancel</button>
-                        </div>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => handleEditStatus(complaint._id, complaint.status)}
-                        className="text-xs px-3 py-1 bg-[#06B6D4] text-[#1F2937] rounded-full hover:bg-[#0891B2]"
-                      >Change Status</button>
-                    )}
-                  </div>
+                        <div className="mt-1">
+  {/* Only show Change Status if not Resolved */}
+  {complaint.status !== "Resolved" && statusEditId !== complaint._id && (
+    <button
+      onClick={() => handleEditStatus(complaint._id, complaint.status)}
+      className="text-xs px-3 py-1 bg-[#06B6D4] text-[#1F2937] rounded-full hover:bg-[#0891B2]"
+    >
+      Change Status
+    </button>
+  )}
+
+  {/* Show resolved message if status is Resolved */}
+  {complaint.status === "Resolved" && (
+    <p className="text-sm text-gray-400 italic">Complaint already resolved</p>
+  )}
+
+  {/* Show status editing dropdown if in edit mode and not Resolved */}
+  {statusEditId === complaint._id && complaint.status !== "Resolved" && (
+    <div className="flex flex-col items-end space-y-2">
+      <select
+        className="bg-[#232B36] text-white border border-[#06B6D4] rounded py-1 px-2"
+        value={statusDrafts[complaint._id]}
+        onChange={(e) =>
+          setStatusDrafts((drafts) => ({
+            ...drafts,
+            [complaint._id]: e.target.value,
+          }))
+        }
+      >
+        {statusOptions.map((status) => (
+          <option key={status} value={status}>{status}</option>
+        ))}
+      </select>
+      <div className="flex gap-2">
+        <button
+          onClick={() => handleConfirmStatus(complaint._id)}
+          className="bg-[#06B6D4] text-[#1F2937] px-2 py-1 text-xs rounded hover:bg-[#0891B2]"
+        >
+          Save
+        </button>
+        <button
+          onClick={handleCancelStatus}
+          className="bg-gray-600 text-white px-2 py-1 text-xs rounded hover:bg-gray-700"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  )}
+</div>
+
                 </div>
 
                 <p className="text-sm mt-3 text-gray-200">{complaint.description}</p>
@@ -194,9 +216,28 @@ export default function AgentComplaints() {
                         {/* <li><b className="text-white">Phone:</b> {complaint.phone}</li> */}
                         <li><b className="text-white">Address:</b> {complaint?.complaintId?.address}</li>
                       </ul>
+                      {complaint?.complaintId?.attachments && complaint?.complaintId?.attachments.length > 0 && (
+                <div className="mb-4">
+                  <h4 className="font-medium text-[#06B6D4] mb-2">Attachments:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {complaint?.complaintId?.attachments.map((_, index) => (
+                      <div
+                        key={index}
+                        className="w-20 h-20 bg-gray-800 rounded-md flex items-center justify-center"
+                      >
+                        <img 
+                           src={`http://localhost:5000/${complaint?.complaintId?.attachments[0]}`}
+                           alt="📷"
+                           className="w-full h-full object-cover rounded transition-transform duration-300 ease-in-out transform hover:scale-300 z-50" 
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
                     </div>
 
-                    <div>
+                    {/* <div>
                       <h4 className="font-semibold text-[#06B6D4] mb-2">Messages</h4>
                       <div className="bg-[#1F2937] rounded p-2 max-h-40 overflow-y-auto mb-2">
                         {complaint.messages?.length > 0 ? (
@@ -230,7 +271,7 @@ export default function AgentComplaints() {
                           className="bg-[#06B6D4] text-[#1F2937] px-4 py-2 rounded hover:bg-[#0891B2] font-bold"
                         >Send</button>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 )}
               </div>
