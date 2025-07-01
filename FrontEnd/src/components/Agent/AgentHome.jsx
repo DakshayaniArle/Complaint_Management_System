@@ -52,7 +52,6 @@ export default function AgentComplaints() {
 
   const handleConfirmStatus = async (assignId) => {
   const updatedStatus = statusDrafts[assignId];
-  const API_URL = process.env.REACT_APP_API_URL;
   try {
     const res = await fetch(`${API_URL}/assign/status/${assignId}`, {
       method: "PATCH",

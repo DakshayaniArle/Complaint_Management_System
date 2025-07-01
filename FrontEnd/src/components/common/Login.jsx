@@ -7,6 +7,7 @@ export default function Login() {
   const [form, setForm] = useState({ email: "", password: "", usertype: "user" });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   
 
@@ -22,10 +23,11 @@ export default function Login() {
     }
 
     setError("");
+    setLoading(true);
 
     try {
       const res = await axios.post(`${API_URL}/login`, form);
-      console.log(res);
+      // console.log(res);
 
       // Store in localStorage
       localStorage.setItem("userData", JSON.stringify(res.data));
@@ -53,11 +55,18 @@ export default function Login() {
       } else {
         setError("Server error. Please try again.");
       }
-    }
+    }finally {
+    setLoading(false); 
+  }
   };
 
   return (
     <>
+       {loading && (
+            <p className="text-center text-yellow-400 text-sm mb-2">
+                        Loading server... this may take a few seconds if it's waking up.
+             </p>
+     )}
       <ResolveNow />
       <div className="min-h-screen bg-[#1F2937] flex items-center justify-center px-4">
         <div className="w-full max-w-md bg-gray-800 rounded-xl shadow-lg p-6 sm:p-8">
