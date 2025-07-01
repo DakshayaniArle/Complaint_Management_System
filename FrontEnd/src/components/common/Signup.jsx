@@ -15,6 +15,7 @@ export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -22,7 +23,6 @@ export default function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const API_URL = import.meta.env.VITE_API_URL;
     if (!form.name || !form.email || !form.password || !form.confirm) {
       setError("All fields are required.");
       return;

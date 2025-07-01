@@ -9,6 +9,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+   const API_URL = import.meta.env.VITE_BACKEND_URL;
   
 
   const handleChange = (e) =>
@@ -16,7 +17,6 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const API_URL = import.meta.env.VITE_API_URL;
     if (!form.email || !form.password || !form.usertype) {
       setError("Please fill in all fields.");
       return;

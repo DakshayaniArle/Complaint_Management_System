@@ -7,7 +7,7 @@ export default function UserComplaints() {
   const [assignments, setAssignments] = useState([]);
   const [filter, setFilter] = useState("all");
   const [agentFilter, setAgentFilter] = useState("all");
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
   
   
 

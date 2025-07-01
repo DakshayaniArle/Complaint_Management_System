@@ -34,7 +34,7 @@ export default function Status() {
 
   const [complaints, setComplaints] = useState([]);
   const [filter, setFilter] = useState("all");
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
   
 
   const user = JSON.parse(localStorage.getItem("userData"));

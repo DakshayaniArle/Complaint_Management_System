@@ -161,7 +161,7 @@ export default function Complaints() {
    const [filter, setFilter] = useState("all");
   const user = JSON.parse(localStorage.getItem("userData"));
   const userId = user?._id;
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
   useEffect(()=>{
     const fetchComplaints =  async ()=>{
       try{

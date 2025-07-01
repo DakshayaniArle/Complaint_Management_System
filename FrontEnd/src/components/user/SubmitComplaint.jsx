@@ -7,7 +7,7 @@ export default function SubmitComplaint() {
   const formRef = useRef();
   const [attachments, setAttachments] = useState([]);
   const [errors, setErrors] = useState({});
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
 
   const validate = (data) => {
     const newErrors = {};
