@@ -34,7 +34,7 @@ function StatusBadge({ status }) {
 // Simple modal for messaging
 function MessageModal({ open, onClose, complaint }) {
   const [message, setMessage] = useState("");
-  const API_URL = process.env.REACT_APP_API_URL;
+  const API_URL = import.meta.env.VITE_API_URL;
 
   if (!open || !complaint) return null;
   return (
@@ -161,7 +161,7 @@ export default function Complaints() {
    const [filter, setFilter] = useState("all");
   const user = JSON.parse(localStorage.getItem("userData"));
   const userId = user?._id;
-
+  const API_URL = import.meta.env.VITE_API_URL;
   useEffect(()=>{
     const fetchComplaints =  async ()=>{
       try{

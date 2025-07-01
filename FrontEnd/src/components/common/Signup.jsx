@@ -14,7 +14,6 @@ export default function Signup() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const API_URL = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
 
   const handleChange = (e) =>
@@ -23,7 +22,7 @@ export default function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    const API_URL = import.meta.env.VITE_API_URL;
     if (!form.name || !form.email || !form.password || !form.confirm) {
       setError("All fields are required.");
       return;

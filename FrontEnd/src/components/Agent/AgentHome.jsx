@@ -9,7 +9,8 @@ export default function AgentComplaints() {
   const [statusEditId, setStatusEditId] = useState(null);
   const [statusDrafts, setStatusDrafts] = useState({});
   const navigate = useNavigate();
-  const API_URL = process.env.REACT_APP_API_URL;
+  const API_URL = import.meta.env.VITE_API_URL;
+  
 
   const user =JSON.parse(localStorage.getItem("userData"));
   const AGENT_NAME = user.name;
@@ -51,6 +52,7 @@ export default function AgentComplaints() {
 
   const handleConfirmStatus = async (assignId) => {
   const updatedStatus = statusDrafts[assignId];
+  const API_URL = process.env.REACT_APP_API_URL;
   try {
     const res = await fetch(`${API_URL}/assign/status/${assignId}`, {
       method: "PATCH",
@@ -72,6 +74,7 @@ export default function AgentComplaints() {
 
   const handleSendMessage = async (assignId) => {
   const message = messageInputs[assignId]?.trim();
+  const API_URL = process.env.REACT_APP_API_URL;
   if (!message) return;
 
   try {

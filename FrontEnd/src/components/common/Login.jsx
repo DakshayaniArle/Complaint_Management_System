@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ResolveNow from "./ResolveNow";
 
@@ -8,13 +8,14 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const API_URL = process.env.REACT_APP_API_URL;
+  
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const API_URL = import.meta.env.VITE_API_URL;
     if (!form.email || !form.password || !form.usertype) {
       setError("Please fill in all fields.");
       return;
@@ -24,6 +25,7 @@ export default function Login() {
 
     try {
       const res = await axios.post(`${API_URL}/login`, form);
+      console.log(res);
 
       // Store in localStorage
       localStorage.setItem("userData", JSON.stringify(res.data));
