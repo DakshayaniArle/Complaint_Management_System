@@ -118,7 +118,7 @@ function ComplaintCard({ complaint, expandedComplaint, setExpandedComplaint, onM
                         <img 
                            src={`http://localhost:5000/${complaint.attachments[0]}`}
                            alt="📷"
-                           className="w-full h-full object-cover" 
+                          className="w-full h-full object-cover rounded transition-transform duration-300 ease-in-out transform hover:scale-300 z-50" 
                         />
                       </div>
                     ))}

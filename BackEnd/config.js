@@ -1,9 +1,10 @@
 const  mongoose = require("mongoose");
+require("dotenv").config();
 
-mongoose.connect("mongodb://localhost:27017/Complaint_Management_System")
+mongoose.connect(process.env.MONGODB_URL)
   .then(()=>{
     console.log("connected successfully to mongoDB");
   })
-  .catch(()=>{
-    console.log("connection error");
+  .catch((error)=>{
+    console.log("connection error",error);
   })

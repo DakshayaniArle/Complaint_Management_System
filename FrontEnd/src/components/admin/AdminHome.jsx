@@ -16,11 +16,11 @@ export default function AdminHome() {
     try{
       const res = await fetch("http://localhost:5000/admin/complaints");
      const data = await res.json();
-     console.log(data);
+    //  console.log(data);
      const unresolved = data.filter(
         (assignment) => assignment.status !== "Resolved"
       );
-      console.log(unresolved);
+      // console.log(unresolved);
       setComplaints(unresolved);
     }catch{(err) => console.error("Error fetching complaints:", err)};
     }
@@ -92,7 +92,7 @@ export default function AdminHome() {
   return assignment ? assignment.agent : "Unassigned";
 };
   const handleLogOut = ()=>{
-    localStorage.removeItem(user);
+    localStorage.removeItem("userData");
     navigate('/login');
   }
 
@@ -117,7 +117,7 @@ export default function AdminHome() {
         <section>
           <h2 className="text-2xl font-bold mb-6">User Complaints</h2>
           {complaints.length === 0  ? (
-            <div className="text-gray-400">No complaints to show.</div>
+            <div className="text-gray-400">Upto now all complaints are Resolved...No complaints to show.</div>
           ) : (
             <div className="bg-[#1F2937] rounded-xl shadow-md p-6 overflow-x-auto">
               <table className="w-full text-left text-sm">
