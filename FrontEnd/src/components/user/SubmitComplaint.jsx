@@ -7,6 +7,7 @@ export default function SubmitComplaint() {
   const formRef = useRef();
   const [attachments, setAttachments] = useState([]);
   const [errors, setErrors] = useState({});
+  const API_URL = process.env.REACT_APP_API_URL;
 
   const validate = (data) => {
     const newErrors = {};
@@ -52,7 +53,7 @@ export default function SubmitComplaint() {
       return;
     }
     try{
-      const res = await fetch("http://localhost:5000/complaints",{
+      const res = await fetch(`${API_URL}/complaints`,{
         method:"POST",
         body:formData
       }); 

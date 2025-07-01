@@ -14,6 +14,7 @@ export default function Signup() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const API_URL = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
 
   const handleChange = (e) =>
@@ -37,7 +38,7 @@ export default function Signup() {
     const updatedUser = { ...form, usertype: title };
 
     try {
-      const res = await axios.post("http://localhost:5000/SignUp", updatedUser);
+      const res = await axios.post(`${API_URL}/SignUp`, updatedUser);
       alert(`Registered as ${updatedUser.usertype} with email: ${updatedUser.email}`);
       setForm({
         name: "",

@@ -7,17 +7,18 @@ export default function UserComplaints() {
   const [assignments, setAssignments] = useState([]);
   const [filter, setFilter] = useState("all");
   const [agentFilter, setAgentFilter] = useState("all");
+  const API_URL = process.env.REACT_APP_API_URL;
   
 
   const fetchComplaints = () => {
-    fetch("http://localhost:5000/admin/complaints")
+    fetch(`${API_URL}/admin/complaints`)
       .then((res) => res.json())
       .then((data) => {setComplaints(data)})
       .catch((err) => console.error("Error fetching complaints:", err));
   };
 
   useEffect(() => {
-     fetch("http://localhost:5000/assignments") 
+     fetch(`${API_URL}/assignments`) 
     .then((res) => res.json())
     .then((data) => setAssignments(data))
     .catch((err) => console.error("Error fetching assignments:", err));

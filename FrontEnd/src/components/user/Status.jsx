@@ -34,6 +34,7 @@ export default function Status() {
 
   const [complaints, setComplaints] = useState([]);
   const [filter, setFilter] = useState("all");
+  const API_URL = process.env.REACT_APP_API_URL;
 
   const user = JSON.parse(localStorage.getItem("userData"));
   const userId = user?._id;
@@ -41,7 +42,7 @@ export default function Status() {
   useEffect(() => {
     const fetchComplaints = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/complaints/${userId}`);
+        const res = await axios.get(`${API_URL}/complaints/${userId}`);
         setComplaints(res.data);
       } catch (err) {
         console.error("Failed to fetch complaints data", err);

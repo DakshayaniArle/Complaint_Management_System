@@ -3,6 +3,7 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+
 export default function AdminHome() {
   const [complaints, setComplaints] = useState([]);
   const [agents, setAgents] = useState([]);
@@ -10,11 +11,12 @@ export default function AdminHome() {
   const [noOfComplaints,setNoOfComplaints] = useState(0);
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("userData"));
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     const fetchComplaints = async () => {
     try{
-      const res = await fetch("http://localhost:5000/admin/complaints");
+      const res = await fetch(`${API_URL}/admin/complaints`);
      const data = await res.json();
     //  console.log(data);
      const unresolved = data.filter(
@@ -24,23 +26,23 @@ export default function AdminHome() {
       setComplaints(unresolved);
     }catch{(err) => console.error("Error fetching complaints:", err)};
     }
-    fetch("http://localhost:5000/admin/agents")
+    fetch(`${API_URL}/admin/agents`)
       .then((res) => res.json())
       .then((data) => setAgents(data))
       .catch((err) => console.error("Error fetching agents:", err));
 
-    fetch("http://localhost:5000/assignments") 
+    fetch(`${API_URL}/assignments`) 
     .then((res) => res.json())
     .then((data) => setAssignments(data))
     .catch((err) => console.error("Error fetching assignments:", err));
 
-    fetch("http://localhost:5000/admin/agents")
+    fetch(`${API_URL}/admin/agents`)
     .then((res) => res.json())
     .then((agentsData) => {
       // For each agent, fetch their assigned complaint count
       Promise.all(
         agentsData.map(async (agent) => {
-          const res = await fetch(`http://localhost:5000/admin/agents/${agent._id}/complaint-count`);
+          const res = await fetch(`${API_URL}/admin/agents/${agent._id}/complaint-count`);
           const { count } = await res.json();
           return { ...agent, assignedCount: count };
         })
@@ -66,7 +68,7 @@ export default function AdminHome() {
   assignedAt: Date.now(),
 };
 
- const res = await fetch("http://localhost:5000/assign", {
+ const res = await fetch(`${API_URL}/assign`, {
   method: "POST",
   headers: {
     "Content-Type": "application/json"

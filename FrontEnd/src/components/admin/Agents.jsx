@@ -4,20 +4,21 @@ import { Link } from "react-router-dom";
 export default function Agents() {
   const [agents, setAgents] = useState([]);
   const [noOfComplaints,setNoOfComplaints] = useState(0);
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
-    fetch("http://localhost:5000/admin/agents")
+    fetch(`${API_URL}/admin/agents`)
       .then((res) => res.json())
       .then((data) => setAgents(data))
       .catch((err) => console.error("Error fetching agents:", err));
 
-    fetch("http://localhost:5000/admin/agents")
+    fetch(`${API_URL}/admin/agents`)
     .then((res) => res.json())
     .then((agentsData) => {
       // For each agent, fetch their assigned complaint count
       Promise.all(
         agentsData.map(async (agent) => {
-          const res = await fetch(`http://localhost:5000/admin/agents/${agent._id}/complaint-count`);
+          const res = await fetch(`${API_URL}/admin/agents/${agent._id}/complaint-count`);
           const { count } = await res.json();
           return { ...agent, assignedCount: count };
         })

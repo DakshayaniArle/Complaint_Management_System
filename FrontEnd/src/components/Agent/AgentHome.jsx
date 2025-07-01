@@ -9,6 +9,7 @@ export default function AgentComplaints() {
   const [statusEditId, setStatusEditId] = useState(null);
   const [statusDrafts, setStatusDrafts] = useState({});
   const navigate = useNavigate();
+  const API_URL = process.env.REACT_APP_API_URL;
 
   const user =JSON.parse(localStorage.getItem("userData"));
   const AGENT_NAME = user.name;
@@ -21,7 +22,7 @@ export default function AgentComplaints() {
     const fetchComplaints = async () => {
       // const user = JSON.parse(localStorage.getItem("userData")); // Must have _id
       try {
-        const res = await fetch(`http://localhost:5000/agent/${user._id}/complaints`);
+        const res = await fetch(`${API_URL}/agent/${user._id}/complaints`);
         const data = await res.json();
         // console.log(data);
         setComplaints(data);
@@ -45,27 +46,13 @@ export default function AgentComplaints() {
     setStatusDrafts((drafts) => ({ ...drafts, [id]: currentStatus }));
   };
 
-  // const handleConfirmStatus = (id) => {
-  //   const updatedStatus = statusDrafts[id];
-  //   fetch(`http://localhost:5000/api/complaints/${id}`, {
-  //     method: "PATCH",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({ status: updatedStatus }),
-  //   })
-  //     .then((res) => res.json())
-  //     .then((updatedComplaint) => {
-  //       setComplaints((prev) =>
-  //         prev.map((c) => (c._id === id ? updatedComplaint : c))
-  //       );
-  //       setStatusEditId(null);
-  //     });
-  // };
+
 
 
   const handleConfirmStatus = async (assignId) => {
   const updatedStatus = statusDrafts[assignId];
   try {
-    const res = await fetch(`http://localhost:5000/assign/status/${assignId}`, {
+    const res = await fetch(`${API_URL}/assign/status/${assignId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: updatedStatus }),
@@ -88,7 +75,7 @@ export default function AgentComplaints() {
   if (!message) return;
 
   try {
-    const res = await fetch(`http://localhost:5000/assign/${assignId}/message`, {
+    const res = await fetch(`${API_URL}/assign/${assignId}/message`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -227,7 +214,7 @@ export default function AgentComplaints() {
                         className="w-20 h-20 bg-gray-800 rounded-md flex items-center justify-center"
                       >
                         <img 
-                           src={`http://localhost:5000/${complaint?.complaintId?.attachments[0]}`}
+                           src={`${API_URL}/${complaint?.complaintId?.attachments[0]}`}
                            alt="📷"
                            className="w-full h-full object-cover rounded transition-transform duration-300 ease-in-out transform hover:scale-300 z-50" 
                         />

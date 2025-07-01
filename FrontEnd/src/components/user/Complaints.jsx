@@ -34,6 +34,8 @@ function StatusBadge({ status }) {
 // Simple modal for messaging
 function MessageModal({ open, onClose, complaint }) {
   const [message, setMessage] = useState("");
+  const API_URL = process.env.REACT_APP_API_URL;
+
   if (!open || !complaint) return null;
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
@@ -116,7 +118,7 @@ function ComplaintCard({ complaint, expandedComplaint, setExpandedComplaint, onM
                         className="w-20 h-20 bg-gray-800 rounded-md flex items-center justify-center"
                       >
                         <img 
-                           src={`http://localhost:5000/${complaint.attachments[0]}`}
+                           src={`${API_URL}/${complaint.attachments[0]}`}
                            alt="📷"
                           className="w-full h-full object-cover rounded transition-transform duration-300 ease-in-out transform hover:scale-300 z-50" 
                         />
@@ -163,7 +165,7 @@ export default function Complaints() {
   useEffect(()=>{
     const fetchComplaints =  async ()=>{
       try{
-        const res = await axios.get(`http://localhost:5000/complaints/${userId}`)
+        const res = await axios.get(`${API_URL}/complaints/${userId}`)
         setComplaints(res.data);
       }catch(err){
         console.error("failed to fetch the complaints data");
