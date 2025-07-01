@@ -1,10 +1,7 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Outlet } from "react-router-dom";
-import { ComplaintProvider } from "./components/user/ComplaintContext"; // 👈 Import your provider
+import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from "react-router-dom";
+import { ComplaintProvider } from "./components/user/ComplaintContext"; 
 
-// Import Navbars
 import Navbar from "./components/user/Navbar";
-
 import UserComplaints from "./components/user/Complaints";
 import SubmitComplaint from "./components/user/SubmitComplaint";
 import Status from "./components/user/Status";
@@ -21,7 +18,10 @@ import Home from "./components/common/Home";
 import Login from "./components/common/Login";
 import Signup from "./components/common/Signup";
 
-// Layout wrappers for navbars
+import ProtectedRoute from "./components/common/ProtectedRoute";
+import PublicRoute from "./components/common/PublicRoute";
+
+// Layout wrappers
 function UserLayout() {
   return (
     <>
@@ -34,7 +34,6 @@ function UserLayout() {
 function AdminLayout() {
   return (
     <>
-      {/* <AdminNavbar /> */}
       <Outlet />
     </>
   );
@@ -43,7 +42,6 @@ function AdminLayout() {
 function AgentLayout() {
   return (
     <>
-      {/* <AgentNavbar /> */}
       <Outlet />
     </>
   );
@@ -55,31 +53,42 @@ export default function App() {
       <ComplaintProvider> 
         <Router>
           <Routes>
-            {/* User Routes */}
-            <Route path="/user" element={<UserLayout />}>
-              <Route index element={<UserHome />} />
-              <Route path="complaints" element={<UserComplaints />} />
-              <Route path="status" element={<Status />} />
-              <Route path="submit" element={<SubmitComplaint />} />
-              <Route path="about" element={<About />} />
+            {/* PUBLIC ROUTES */}
+            <Route element={<PublicRoute />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
             </Route>
 
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<AdminHome />} />
-              <Route path="agents" element={<Agents />} />
-              <Route path="complaints" element={<UserComplaintsAdmin />} />
+            {/* USER PROTECTED ROUTES */}
+            <Route element={<ProtectedRoute allowedRole="user" />}>
+              <Route path="/user" element={<UserLayout />}>
+                <Route index element={<UserHome />} />
+                <Route path="complaints" element={<UserComplaints />} />
+                <Route path="status" element={<Status />} />
+                <Route path="submit" element={<SubmitComplaint />} />
+                <Route path="about" element={<About />} />
+              </Route>
             </Route>
 
-            {/* Agent Routes */}
-            <Route path="/agent" element={<AgentLayout />}>
-              <Route index element={<AgentHome />} />
+            {/* ADMIN PROTECTED ROUTES */}
+            <Route element={<ProtectedRoute allowedRole="admin" />}>
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminHome />} />
+                <Route path="agents" element={<Agents />} />
+                <Route path="complaints" element={<UserComplaintsAdmin />} />
+              </Route>
             </Route>
 
-            {/* Public/Common Routes */}
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+            {/* AGENT PROTECTED ROUTES */}
+            <Route element={<ProtectedRoute allowedRole="agent" />}>
+              <Route path="/agent" element={<AgentLayout />}>
+                <Route index element={<AgentHome />} />
+              </Route>
+            </Route>
+
+            {/* CATCH-ALL */}
+            <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </Router>
       </ComplaintProvider>

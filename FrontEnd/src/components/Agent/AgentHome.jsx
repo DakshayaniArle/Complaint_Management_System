@@ -12,7 +12,8 @@ export default function AgentComplaints() {
 
   const user =JSON.parse(localStorage.getItem("userData"));
   const AGENT_NAME = user.name;
-  const AGENT_LOGO_URL = "https://ui-avatars.com/api/?name=Agent+Sarah&background=06B6D4&color=fff";
+  const extraChar = " ";
+  const AGENT_LOGO_URL = `https://ui-avatars.com/api/?name=Agent+${AGENT_NAME}&background=06B6D4&color=fff`;
   const statusOptions = ["Pending", "In Progress", "Resolved", "Rejected"];
   
 
@@ -22,7 +23,7 @@ export default function AgentComplaints() {
       try {
         const res = await fetch(`http://localhost:5000/agent/${user._id}/complaints`);
         const data = await res.json();
-        console.log(data);
+        // console.log(data);
         setComplaints(data);
       } catch (err) {
         console.error("Failed to fetch complaints", err);
@@ -35,7 +36,7 @@ export default function AgentComplaints() {
 
   const handleLogout = () => {
     // Clear session data if needed
-    localStorage.removeItem(user);
+    localStorage.removeItem("userData");
     navigate("/login");
   };
 
@@ -111,7 +112,7 @@ export default function AgentComplaints() {
       <nav className="bg-gradient-to-r from-[#1F2937] to-[#06B6D4] shadow-lg sticky top-0 z-40 py-3 mb-6">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div className="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-4">
-            <span className="text-xl font-bold">{AGENT_NAME}</span>
+            <span className="text-xl font-bold">Hi, Agent {AGENT_NAME}</span>
             <span className="text-sm sm:text-base text-white">User Complaints</span>
           </div>
           <div className="flex items-center space-x-4">
