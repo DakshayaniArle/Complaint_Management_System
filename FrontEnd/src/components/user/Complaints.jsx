@@ -65,6 +65,7 @@ function MessageModal({ open, onClose, complaint }) {
 
 // Complaint card
 function ComplaintCard({ complaint, expandedComplaint, setExpandedComplaint, onMessage }) {
+  const API_URL = import.meta.env.VITE_API_URL;
   return (
     <div className="bg-[#1F2937] rounded-xl shadow-lg p-6 border-l-4 border-[#06B6D4] transition-all duration-300 hover:scale-[1.015] hover:shadow-2xl">
       <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
@@ -79,11 +80,11 @@ function ComplaintCard({ complaint, expandedComplaint, setExpandedComplaint, onM
         <div className="flex flex-wrap gap-3">
           <button
             onClick={() =>
-              setExpandedComplaint(expandedComplaint === complaint.id ? null : complaint.id)
+              setExpandedComplaint(expandedComplaint === complaint._id ? null : complaint._id)
             }
             className="bg-[#06B6D4]/10 text-[#06B6D4] px-4 py-2 rounded-full text-sm font-medium hover:bg-[#06B6D4]/20 transition"
           >
-            {expandedComplaint === complaint.id ? "Hide Details" : "View Details"}
+            {expandedComplaint === complaint._id ? "Hide Details" : "View Details"}
           </button>
           {/* <button
             className="bg-gray-700 text-gray-200 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition"
@@ -93,7 +94,7 @@ function ComplaintCard({ complaint, expandedComplaint, setExpandedComplaint, onM
           </button> */}
         </div>
       </div>
-      {expandedComplaint === complaint.id && (
+      {expandedComplaint === complaint._id && (
         <div className="mt-4 pt-4 border-t border-gray-600">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
