@@ -24,7 +24,9 @@ ResolveNow is a full-stack web application that allows users to submit complaint
 - 🔐 **Role-based routing and access control**
 - 📦 State management using React Context
 - 🌐 Backend built with Express & MongoDB
+-📧 Email notifications sent to users on successful registration
 
+Demo Video Link :: https://drive.google.com/file/d/19wOPmpqUMx6H1Sfv23Mj4OUjMQi59_AB/view?usp=sharing
 ## 🚀 Live Demo
   [![Live Demo](https://img.shields.io/badge/Live-Demo-green)](https://complaint-management-system-five.vercel.app/)
 
