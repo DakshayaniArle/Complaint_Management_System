@@ -34,7 +34,7 @@ function StatusBadge({ status }) {
 // Simple modal for messaging
 function MessageModal({ open, onClose, complaint }) {
   const [message, setMessage] = useState("");
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
 
   if (!open || !complaint) return null;
   return (
@@ -65,7 +65,7 @@ function MessageModal({ open, onClose, complaint }) {
 
 // Complaint card
 function ComplaintCard({ complaint, expandedComplaint, setExpandedComplaint, onMessage }) {
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
   return (
     <div className="bg-[#1F2937] rounded-xl shadow-lg p-6 border-l-4 border-[#06B6D4] transition-all duration-300 hover:scale-[1.015] hover:shadow-2xl">
       <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
